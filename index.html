@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover" />
+<title>ארבע הקופות</title>
+<link rel="manifest" href="./manifest.webmanifest">
+<meta name="theme-color" content="#6c5ce7">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="הקופות">
+<link rel="apple-touch-icon" href="./apple-touch-icon.png">
+<link rel="icon" href="./icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&family=Varela+Round&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#2b2b3c; --ink-soft:#76768d; --line:#eeecf4;
+    --bg:#faf8ff; --card:#ffffff;
+    --treats:#ff9f1c; --treats-l:#fff2db;
+    --short:#13bca3;  --short-l:#ddf6f1;
+    --long:#6c5ce7;   --long-l:#ebeafe;
+    --give:#ff5c8a;   --give-l:#ffe4ec;
+    --shadow:0 12px 30px rgba(60,40,120,.09), 0 3px 8px rgba(60,40,120,.05);
+    --radius:26px;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0; padding:0;}
+  body{
+    font-family:'Rubik',system-ui,sans-serif; color:var(--ink);
+    background:var(--bg); min-height:100vh; line-height:1.5;
+    background-image:radial-gradient(70vw 50vw at 110% -15%, rgba(108,92,231,.07), transparent 60%);
+    background-attachment:fixed;
+  }
+  .wrap{max-width:760px; margin:0 auto; padding:18px 16px 70px;}
+
+  /* header */
+  .top{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:14px;}
+  .brand{display:flex; align-items:center; gap:8px;}
+  .brand .logo{font-size:28px;}
+  h1{font-family:'Varela Round',sans-serif; font-size:23px; margin:0; font-weight:400;}
+  h1 .nm{color:var(--long);}
+  .gear{border:none; background:#fff; width:42px; height:42px; border-radius:50%; box-shadow:var(--shadow); font-size:18px; cursor:pointer; flex:none;}
+  .gear:active{transform:scale(.92);}
+  .nameRow{display:flex; align-items:center; gap:8px; margin:0 0 16px; color:var(--ink-soft); font-size:13px;}
+  .nameRow input{font-family:'Varela Round',sans-serif; font-size:15px; color:var(--ink); border:1px dashed #d8d4e6; border-radius:12px; padding:6px 12px; background:#fff; max-width:160px; text-align:center;}
+  .nameRow input:focus{outline:none; border-color:var(--long);}
+
+  /* wallet hero */
+  .wallet{background:linear-gradient(135deg,#6c5ce7,#8b7bff); color:#fff; border-radius:var(--radius); box-shadow:var(--shadow); padding:20px 22px; margin-bottom:18px;}
+  .wallet .wl{font-size:14px; opacity:.92;}
+  .wallet .wa{font-size:40px; font-weight:800; line-height:1.05; margin:2px 0 4px;}
+  .wallet .wtip{font-size:12.5px; opacity:.85; min-height:16px;}
+  .wallet .wbtns{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px;}
+  .wallet .wbtns button{border:none; font-family:'Varela Round',sans-serif; font-size:16px; padding:14px 10px; border-radius:16px; cursor:pointer;}
+  .wallet .got{background:#fff; color:#5a49d6;}
+  .wallet .split{background:rgba(255,255,255,.22); color:#fff;}
+  .wallet .split:disabled{opacity:.45; cursor:default;}
+  .wallet button:not(:disabled):active{transform:scale(.96);}
+
+  /* 2x2 tiles */
+  .tiles{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:18px;}
+  .tile{background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow); padding:18px 16px 20px; cursor:pointer; border:3px solid transparent; display:flex; flex-direction:column; align-items:center; text-align:center; gap:6px; transition:transform .12s ease; min-height:158px; justify-content:center;}
+  .tile:active{transform:scale(.96);}
+  .tile .em{font-size:40px; width:70px; height:70px; display:grid; place-items:center; border-radius:22px;}
+  .tile .tn{font-family:'Varela Round',sans-serif; font-size:17px;}
+  .tile .ta{font-size:28px; font-weight:800; line-height:1.1;}
+
+  /* interest (subtle) */
+  .interestCard{background:#fff; border:2px solid var(--long-l); border-radius:var(--radius); box-shadow:var(--shadow); padding:16px 18px; display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:14px;}
+  .interestCard .ic-l .t{font-family:'Varela Round',sans-serif; font-size:17px;}
+  .interestCard .ic-l .s{font-size:12.5px; color:var(--ink-soft); margin-top:2px;}
+  .interestCard .ic-btn{border:none; background:var(--long); color:#fff; font-family:'Varela Round',sans-serif; font-size:15px; padding:12px 18px; border-radius:14px; cursor:pointer; flex:none; white-space:nowrap;}
+  .interestCard .ic-btn:active{transform:scale(.95);}
+  .interestCard.done{border-color:var(--line); background:#f8f7fc;}
+  .interestCard.done .ic-btn{background:#d9d5ea; color:#6a6585;}
+
+  .received{text-align:center; color:var(--ink-soft); font-size:13.5px; margin-bottom:6px;}
+  .received b{font-family:'Varela Round',sans-serif; color:var(--treats); font-size:15px;}
+
+  .foot{text-align:center; color:var(--ink-soft); font-size:11.5px; margin-top:14px; line-height:1.6;}
+
+  /* back btn shared */
+  .back{display:inline-flex; align-items:center; gap:6px; border:none; background:#fff; box-shadow:var(--shadow); border-radius:16px; padding:11px 18px; font-family:'Varela Round',sans-serif; font-size:16px; color:var(--ink); cursor:pointer; margin-bottom:18px;}
+  .back:active{transform:scale(.95);}
+
+  /* DETAIL */
+  .detail,.divide{display:none;}
+  .dBanner{border-radius:var(--radius); padding:26px 20px; text-align:center; box-shadow:var(--shadow); color:#fff; margin-bottom:18px;}
+  .dBanner .em{font-size:52px;}
+  .dBanner .nm{font-family:'Varela Round',sans-serif; font-size:22px; margin-top:4px;}
+  .dBanner .amt{font-size:46px; font-weight:800; margin-top:6px; line-height:1;}
+  .dBanner .sub{font-size:13px; opacity:.92; margin-top:8px;}
+  .dActions{margin-bottom:22px;}
+  .dActions button{width:100%; border:none; font-family:'Varela Round',sans-serif; font-size:19px; padding:20px; border-radius:20px; cursor:pointer; box-shadow:var(--shadow); background:#fff;}
+  .dActions button:active{transform:scale(.97);}
+  .histTitle{font-family:'Varela Round',sans-serif; font-size:17px; margin:0 0 10px; color:var(--ink-soft);}
+  .histBox{background:#fff; border-radius:var(--radius); box-shadow:var(--shadow); padding:8px 16px;}
+  .empty{color:var(--ink-soft); font-size:14px; text-align:center; padding:22px 0;}
+  .row{display:flex; align-items:center; gap:12px; padding:13px 2px; border-bottom:1px solid var(--line);}
+  .row:last-child{border-bottom:none;}
+  .rmid{flex:1; min-width:0;}
+  .rtitle{font-size:15px; font-weight:500;}
+  .rmeta{font-size:12.5px; color:var(--ink-soft); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .ramt{font-weight:800; font-size:16px; white-space:nowrap;}
+  .plus{color:var(--short);} .minus{color:var(--give);}
+  .moreBtn{display:block; margin:10px auto; border:none; background:#f4f2fa; color:var(--ink-soft); font-family:inherit; padding:9px 20px; border-radius:12px; cursor:pointer; font-size:13px;}
+
+  /* DIVIDE */
+  .dvHead{background:linear-gradient(135deg,#6c5ce7,#8b7bff); color:#fff; border-radius:var(--radius); box-shadow:var(--shadow); padding:18px 20px; text-align:center; margin-bottom:16px;}
+  .dvHead .l{font-size:14px; opacity:.9;}
+  .dvHead .n{font-size:40px; font-weight:800; line-height:1.05; margin-top:2px;}
+  .dvHead .n.zero{color:#ffe08a;}
+  .dvList{display:flex; flex-direction:column; gap:12px; margin-bottom:18px;}
+  .dvRow{background:#fff; border-radius:20px; box-shadow:var(--shadow); padding:14px 16px; display:flex; align-items:center; gap:12px;}
+  .dvEm{font-size:26px; width:50px; height:50px; display:grid; place-items:center; border-radius:16px; flex:none;}
+  .dvInfo{flex:1; min-width:0;}
+  .dvName{font-family:'Varela Round',sans-serif; font-size:16px;}
+  .dvHint{font-size:11.5px; color:var(--give); min-height:14px;}
+  .dvCtl{display:flex; align-items:center; gap:8px; flex:none;}
+  .dvCtl button{width:38px; height:38px; border:none; border-radius:12px; font-size:22px; font-weight:700; cursor:pointer; background:#f1eef9; color:var(--ink); line-height:1;}
+  .dvCtl button:active{transform:scale(.9);}
+  .dvCtl input{width:56px; text-align:center; border:2px solid var(--line); border-radius:12px; padding:8px 4px; font:inherit; font-size:18px; font-weight:700;}
+  .dvCtl input:focus{outline:none; border-color:var(--long);}
+  .dvActions{display:flex; gap:10px;}
+  .dvActions .even{flex:none; border:2px solid var(--long-l); background:#fff; color:var(--long); font-family:'Varela Round',sans-serif; font-size:15px; padding:0 16px; border-radius:18px; cursor:pointer;}
+  .dvActions .go{flex:1; border:none; background:var(--long); color:#fff; font-family:'Varela Round',sans-serif; font-size:18px; padding:16px; border-radius:18px; cursor:pointer;}
+  .dvActions .go:disabled{opacity:.4; cursor:default;}
+  .dvActions button:not(:disabled):active{transform:scale(.97);}
+
+  /* MODAL */
+  .scrim{position:fixed; inset:0; background:rgba(35,25,70,.45); backdrop-filter:blur(3px); display:none; align-items:flex-end; justify-content:center; z-index:50;}
+  .scrim.on{display:flex;}
+  @media(min-width:560px){ .scrim{align-items:center; padding:20px;} }
+  .sheet{background:#fff; width:100%; max-width:430px; border-radius:28px 28px 0 0; padding:24px 22px 28px; box-shadow:0 -10px 40px rgba(40,20,80,.2);}
+  @media(min-width:560px){ .sheet{border-radius:28px;} }
+  .scrim.on .sheet{animation:rise .26s cubic-bezier(.22,1,.36,1) both;}
+  @keyframes rise{from{transform:translateY(40px);opacity:.5;} to{transform:translateY(0);opacity:1;}}
+  .mhead{display:flex; align-items:center; gap:10px; margin-bottom:16px;}
+  .mhead .em{font-size:30px;}
+  .mhead .mt{font-family:'Varela Round',sans-serif; font-size:21px;}
+  .field label{font-size:14px; color:var(--ink-soft); display:block; margin-bottom:8px;}
+  .amtInput{display:flex; align-items:center; gap:8px; border:2px solid var(--line); border-radius:18px; padding:8px 16px; font-size:30px; font-weight:800;}
+  .amtInput:focus-within{border-color:var(--long);}
+  .amtInput input{border:none; outline:none; font:inherit; width:100%; text-align:center; color:var(--ink); background:transparent;}
+  .amtInput .cur{color:var(--ink-soft); font-size:24px;}
+  .chips{display:flex; gap:8px; flex-wrap:wrap; margin-top:14px;}
+  .chips button{border:1px solid var(--line); background:#fff; font-family:inherit; font-size:15px; font-weight:700; padding:10px 16px; border-radius:14px; cursor:pointer;}
+  .chips button:active{transform:scale(.93);}
+  .reason{margin-top:18px;}
+  .reason input{width:100%; border:2px solid var(--line); border-radius:18px; padding:13px 16px; font:inherit; font-size:16px;}
+  .reason input:focus{outline:none; border-color:var(--long);}
+  .err{color:var(--give); font-size:13.5px; margin-top:10px; min-height:17px; text-align:center;}
+  .taxNote{margin-top:14px; background:#fff3e0; color:#9a5800; border:1px solid #ffe1b3; border-radius:14px; padding:12px 14px; font-size:13.5px; line-height:1.55; text-align:center;}
+  .taxNote b{font-family:'Varela Round',sans-serif;}
+  .setList{display:flex; flex-direction:column; gap:10px;}
+  .setBtn{display:flex; align-items:center; gap:14px; width:100%; text-align:right; border:1px solid var(--line); background:#fff; border-radius:18px; padding:14px 16px; cursor:pointer; font-family:inherit; color:var(--ink);}
+  .setBtn:active{transform:scale(.98);}
+  .setBtn span{font-size:26px; flex:none;}
+  .setBtn b{font-family:'Varela Round',sans-serif; font-size:16px; display:block;}
+  .setBtn small{color:var(--ink-soft); font-size:12.5px;}
+  .setBtn.danger{border-color:#ffd5e0;}
+  .setBtn.danger b{color:var(--give);}
+  .mactions{display:flex; gap:10px; margin-top:20px;}
+  .mactions button{flex:1; border:none; font-family:'Varela Round',sans-serif; font-size:18px; padding:16px; border-radius:18px; cursor:pointer;}
+  .mactions .cancel{background:#f4f2fa; color:var(--ink-soft);}
+  .mactions .ok{color:#fff;}
+  .mactions button:active{transform:scale(.97);}
+
+  .toast{position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(20px); background:#2b2b3c; color:#fff; padding:15px 22px; border-radius:18px; font-weight:600; font-size:15px; box-shadow:var(--shadow); opacity:0; pointer-events:none; transition:.35s; z-index:80; max-width:90vw; text-align:center;}
+  .toast.on{opacity:1; transform:translateX(-50%) translateY(0);}
+  .burst{position:fixed; inset:0; pointer-events:none; z-index:70; overflow:hidden;}
+  .conf{position:absolute; animation:fall 1.4s ease-in forwards;}
+  @keyframes fall{0%{transform:translateY(-10vh) rotate(0);opacity:1;} 100%{transform:translateY(110vh) rotate(540deg);opacity:0;}}
+  .view-enter{animation:slideIn .22s ease both;}
+  @keyframes slideIn{from{transform:translateX(-14px);opacity:.4;} to{transform:translateX(0);opacity:1;}}
+  @media (prefers-reduced-motion: reduce){ *{animation:none!important; transition:none!important;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ===== HOME ===== -->
+  <div id="home">
+    <div class="top">
+      <div class="brand"><span class="logo">🫙</span><h1>הקופות של <span class="nm" id="titleName">שלי</span></h1></div>
+      <button class="gear" id="gear" title="הגדרות">⚙️</button>
+    </div>
+    <div class="nameRow"><span>שם הילד/ה:</span><input id="nameInput" placeholder="כתבו כאן" maxlength="14" /></div>
+
+    <div class="wallet">
+      <div class="wl">💰 כסף בארנק — מחכה לחלוקה</div>
+      <div class="wa" id="walletAmt">0 ₪</div>
+      <div class="wtip" id="walletTip">קודם רושמים כסף שנכנס, ואז מחלקים לצנצנות.</div>
+      <div class="wbtns">
+        <button class="got" id="incomeBtn">➕ קיבלתי כסף</button>
+        <button class="split" id="splitBtn">✂️ לחלק לצנצנות</button>
+      </div>
+    </div>
+
+    <div class="tiles" id="tiles"></div>
+
+    <div class="interestCard" id="interestCard">
+      <div class="ic-l"><div class="t" id="icTitle">ריבית של החודש</div><div class="s" id="icSub">5% לחיסכון · 10% להשקעה</div></div>
+      <button class="ic-btn" id="interestBtn">🎉 לתת ריבית</button>
+    </div>
+
+    <div class="received">💰 כסף שנתת לו בסך הכל: <b id="receivedAmt">0 ₪</b></div>
+    <div class="foot">💾 הכסף נשמר אוטומטית במכשיר הזה.<br>אפשר להוריד את הקובץ — הוא יעבוד וישמור גם בלי אינטרנט.</div>
+  </div>
+
+  <!-- ===== DETAIL ===== -->
+  <div id="detail" class="detail">
+    <button class="back" id="backBtn">→ חזרה לכל הקופות</button>
+    <div class="dBanner" id="dBanner">
+      <div class="em" id="dEmoji">🫙</div>
+      <div class="nm" id="dName">קופה</div>
+      <div class="amt" id="dAmt">0 ₪</div>
+      <div class="sub" id="dSub"></div>
+      <div class="sub" id="dEarn" style="font-weight:700; margin-top:8px;"></div>
+    </div>
+    <div class="dActions"><button id="dSubBtn">➖ להוציא מהצנצנת</button></div>
+    <div class="histTitle">מה קרה בצנצנת הזו 📒</div>
+    <div class="histBox" id="histBox"></div>
+  </div>
+
+  <!-- ===== DIVIDE ===== -->
+  <div id="divide" class="divide">
+    <button class="back" id="backBtn2">→ חזרה</button>
+    <div class="dvHead">
+      <div class="l">נשאר לחלק מהארנק</div>
+      <div class="n" id="dvRemain">0 ₪</div>
+    </div>
+    <div class="dvList" id="dvList"></div>
+    <div class="dvActions">
+      <button class="even" id="dvEven">⚖️ שווה</button>
+      <button class="go" id="dvGo" disabled>✂️ לחלק עכשיו</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- modal (income / withdraw) -->
+<div class="scrim" id="scrim">
+  <div class="sheet">
+    <div class="mhead"><span class="em" id="mEmoji">💰</span><span class="mt" id="mTitle">פעולה</span></div>
+    <div class="field">
+      <label id="mLabel">כמה שקלים?</label>
+      <div class="amtInput"><input id="amtInput" type="number" inputmode="decimal" min="0" step="any" placeholder="0" /><span class="cur">₪</span></div>
+      <div class="chips" id="chips"></div>
+    </div>
+    <div class="reason" id="reasonWrap" style="display:none;">
+      <label id="reasonLabel">על מה?</label>
+      <input id="reasonInput" placeholder="לדוגמה: קניתי ספר" maxlength="40" />
+    </div>
+    <div class="taxNote" id="taxNote" style="display:none;"></div>
+    <div class="err" id="err"></div>
+    <div class="mactions"><button class="cancel" id="cancelBtn">ביטול</button><button class="ok" id="okBtn">אישור</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="burst" id="burst"></div>
+
+<!-- settings sheet -->
+<div class="scrim" id="setScrim">
+  <div class="sheet">
+    <div class="mhead"><span class="em">⚙️</span><span class="mt">הגדרות</span></div>
+    <div class="setList">
+      <button class="setBtn" id="btnBackup"><span>📤</span><div><b>גיבוי</b><small>שמירת קובץ של כל הנתונים</small></div></button>
+      <button class="setBtn" id="btnRestore"><span>📥</span><div><b>שחזור</b><small>טעינת נתונים מקובץ גיבוי</small></div></button>
+      <button class="setBtn danger" id="btnReset"><span>🗑️</span><div><b>למחוק הכול</b><small>איפוס מלא — אי אפשר לבטל</small></div></button>
+    </div>
+    <div class="mactions"><button class="cancel" id="setClose">סגירה</button></div>
+    <input id="importFile" type="file" accept="application/json,.json" style="display:none" />
+  </div>
+</div>
+
+<script>
+/* -------- storage -------- */
+const KEY='arba-kupot-v1';
+const Store={
+  async load(){
+    try{ if(window.storage&&window.storage.get){const r=await window.storage.get(KEY); if(r&&r.value) return JSON.parse(r.value);} }catch(e){}
+    try{ const v=localStorage.getItem(KEY); if(v) return JSON.parse(v);}catch(e){}
+    return null;
+  },
+  async save(s){ const str=JSON.stringify(s);
+    try{ if(window.storage&&window.storage.set) await window.storage.set(KEY,str);}catch(e){}
+    try{ localStorage.setItem(KEY,str);}catch(e){} }
+};
+
+/* -------- jars -------- */
+const JARS=[
+  {key:'treats',name:'פינוקים',         emoji:'🍭',color:'var(--treats)',light:'var(--treats-l)',hex:'#ff9f1c',sub:'לדברים שבא לקנות עכשיו'},
+  {key:'short', name:'חיסכון קצר',       emoji:'🌱',color:'var(--short)', light:'var(--short-l)', hex:'#13bca3',sub:'כל חודש אמא מוסיפה 5% ריבית'},
+  {key:'long',  name:'השקעה לטווח ארוך', emoji:'🌳',color:'var(--long)',  light:'var(--long-l)',  hex:'#6c5ce7',sub:'כל חודש 10% — הכי הרבה גדל!'},
+  {key:'give',  name:'נתינה',            emoji:'💛',color:'var(--give)',  light:'var(--give-l)',  hex:'#ff5c8a',sub:'על כל שקל שתחלקו לכאן — אמא מכפילה!',match:true},
+];
+const JM=Object.fromEntries(JARS.map(j=>[j.key,j]));
+const HMONTHS=['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
+function monthKey(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); }
+function monthLabel(d){ return HMONTHS[d.getMonth()]+' '+d.getFullYear(); }
+
+/* -------- state -------- */
+let state=null, view='home', current=null, logLimit=8, alloc={};
+function fresh(){ return {name:'',wallet:0,jars:{treats:0,short:0,long:0,give:0},principal:{short:0,long:0},longStart:null,received:0,lastInterest:null,log:[]}; }
+function r2(n){ return Math.round(n*100)/100; }
+function fmt(n){ const v=r2(n); const o=Number.isInteger(v)?{maximumFractionDigits:0}:{minimumFractionDigits:0,maximumFractionDigits:2}; return new Intl.NumberFormat('he-IL',o).format(v)+' ₪'; }
+function addLog(jar,label,amount,note){ state.log.unshift({t:Date.now(),jar,label,amount,note:note||''}); if(state.log.length>400) state.log.length=400; }
+function earnedInterest(jar){ return r2(state.log.filter(e=>e.jar===jar && e.label.indexOf('ריבית')===0).reduce((s,e)=>s+e.amount,0)); }
+function jarGains(jar){ const p=(state.principal&&state.principal[jar])||0; return r2(Math.max(0, state.jars[jar]-p)); }
+function longFreeDate(){ if(!state.longStart) return null; const f=new Date(state.longStart); f.setFullYear(f.getFullYear()+1); return f; }
+function isLongEarly(){ const f=longFreeDate(); return f ? (new Date() < f) : false; }
+function taxCalc(jar,W){ const bal=state.jars[jar]; if(bal<=0) return {interestPortion:0,tax:0}; const ip=r2(W*(jarGains(jar)/bal)); return {interestPortion:ip, tax:r2(0.25*ip)}; }
+function maxReceivable(jar){ const bal=state.jars[jar]; const f=bal>0?jarGains(jar)/bal:0; return r2(bal/(1+0.25*f)); }
+function earnedMatch(jar){ return r2(state.log.filter(e=>e.jar===jar && e.note==='התאמה').reduce((s,e)=>s+e.amount,0)); }
+function incomeTotal(){ return r2(state.log.filter(e=>e.jar==='wallet' && e.amount>0).reduce((s,e)=>s+e.amount,0)); }
+
+/* -------- HOME -------- */
+function renderHome(){
+  document.getElementById('titleName').textContent=state.name||'שלי';
+  const ni=document.getElementById('nameInput'); if(document.activeElement!==ni) ni.value=state.name||'';
+  document.getElementById('walletAmt').textContent=fmt(state.wallet);
+  const split=document.getElementById('splitBtn'); split.disabled=state.wallet<=0;
+  document.getElementById('walletTip').textContent = state.wallet>0 ? 'יש כסף בארנק — אפשר לחלק לצנצנות ✂️' : 'קודם רושמים כסף שנכנס, ואז מחלקים לצנצנות.';
+  document.getElementById('receivedAmt').textContent=fmt(incomeTotal());
+
+  const box=document.getElementById('tiles'); box.innerHTML='';
+  JARS.forEach(j=>{
+    const t=document.createElement('div'); t.className='tile'; t.dataset.jar=j.key; t.style.borderColor=j.light;
+    t.innerHTML=`<div class="em" style="background:${j.light}">${j.emoji}</div><div class="tn">${j.name}</div><div class="ta" style="color:${j.color}">${fmt(state.jars[j.key])}</div>`;
+    box.appendChild(t);
+  });
+
+  const now=new Date(), lbl=monthLabel(now), done=state.lastInterest===monthKey(now);
+  const card=document.getElementById('interestCard');
+  document.getElementById('icTitle').textContent='ריבית של '+lbl;
+  if(done){ card.classList.add('done'); document.getElementById('icSub').textContent='✓ כבר ניתנה החודש'; document.getElementById('interestBtn').textContent='ניתנה ✓'; }
+  else{ card.classList.remove('done'); document.getElementById('icSub').textContent='5% לחיסכון · 10% להשקעה'; document.getElementById('interestBtn').textContent='🎉 לתת ריבית'; }
+}
+
+/* -------- DETAIL -------- */
+function openDetail(key){ current=key; view='detail'; show('detail'); renderDetail(); }
+function renderDetail(){
+  const j=JM[current];
+  const ban=document.getElementById('dBanner'); ban.style.background=`linear-gradient(135deg, ${j.hex}, ${j.hex}dd)`;
+  document.getElementById('dEmoji').textContent=j.emoji;
+  document.getElementById('dName').textContent=j.name;
+  document.getElementById('dAmt').textContent=fmt(state.jars[j.key]);
+  document.getElementById('dSub').textContent=j.sub;
+  const earnEl=document.getElementById('dEarn');
+  if(current==='short'){ const g=jarGains('short'); earnEl.textContent = `📈 רווח שהצטבר: ${fmt(g)}`; }
+  else if(current==='long'){
+    const g=jarGains('long'); let s=`📈 רווח שהצטבר: ${fmt(g)}`;
+    const fd=longFreeDate();
+    if(fd){ const dstr=fd.toLocaleDateString('he-IL',{day:'numeric',month:'long',year:'numeric'});
+      s += isLongEarly() ? `<br>🔒 משיכה לפני ${dstr} → 25% מס על הרווח` : `<br>✅ עברה שנה — אפשר למשוך בלי מס`; }
+    earnEl.innerHTML=s;
+  }
+  else if(current==='give'){ const e=earnedMatch(current); earnEl.textContent = e>0 ? `💛 אמא הוסיפה עד היום: ${fmt(e)}` : ''; }
+  else earnEl.textContent='';
+  document.getElementById('dSubBtn').style.color=j.hex;
+  const hb=document.getElementById('histBox'); hb.innerHTML='';
+  const entries=state.log.filter(e=>e.jar===current);
+  if(!entries.length){ hb.innerHTML='<div class="empty">עוד לא נכנס כסף לצנצנת הזו 🌟<br>מחלקים מהארנק כדי למלא אותה.</div>'; return; }
+  entries.slice(0,logLimit).forEach(e=>{
+    const sign=e.amount>=0?'+':'−', cls=e.amount>=0?'plus':'minus';
+    const date=new Date(e.t).toLocaleDateString('he-IL',{day:'numeric',month:'short'});
+    const meta=[date,e.note].filter(Boolean).join(' · ');
+    const row=document.createElement('div'); row.className='row';
+    row.innerHTML=`<div class="rmid"><div class="rtitle">${e.label}</div><div class="rmeta">${meta}</div></div><div class="ramt ${cls}">${sign}${fmt(Math.abs(e.amount))}</div>`;
+    hb.appendChild(row);
+  });
+  if(entries.length>logLimit){ const b=document.createElement('button'); b.className='moreBtn'; b.textContent='להציג עוד'; b.onclick=()=>{logLimit+=10; renderDetail();}; hb.appendChild(b); }
+}
+
+/* -------- DIVIDE -------- */
+function openDivide(){
+  if(state.wallet<=0){ toast('אין כסף לחלק — קודם "קיבלתי כסף" 🙂'); return; }
+  view='divide'; alloc={treats:0,short:0,long:0,give:0}; show('divide');
+  const list=document.getElementById('dvList'); list.innerHTML='';
+  JARS.forEach(j=>{
+    const r=document.createElement('div'); r.className='dvRow';
+    r.innerHTML=`<div class="dvEm" style="background:${j.light}">${j.emoji}</div>
+      <div class="dvInfo"><div class="dvName">${j.name}</div><div class="dvHint" data-hint="${j.key}"></div></div>
+      <div class="dvCtl">
+        <button data-dec="${j.key}">−</button>
+        <input data-inp="${j.key}" type="number" inputmode="numeric" min="0" value="0">
+        <button data-inc="${j.key}">+</button>
+      </div>`;
+    list.appendChild(r);
+  });
+  updateRemain();
+}
+function allocTotal(){ return JARS.reduce((s,j)=>s+(alloc[j.key]||0),0); }
+function setAlloc(key,val){
+  val=Math.max(0, Math.round(val||0));
+  const others=allocTotal()-(alloc[key]||0);
+  if(val+others>state.wallet) val=Math.max(0, Math.floor(state.wallet-others));
+  alloc[key]=val;
+  const inp=document.querySelector(`[data-inp="${key}"]`); if(inp) inp.value=val;
+  updateRemain();
+}
+function updateRemain(){
+  const remain=r2(state.wallet-allocTotal());
+  const el=document.getElementById('dvRemain'); el.textContent=fmt(remain); el.classList.toggle('zero',remain<=0);
+  const giveHint=document.querySelector('[data-hint="give"]');
+  if(giveHint) giveHint.textContent = alloc.give>0 ? `💛 אמא תוסיף עוד ${fmt(alloc.give)}` : 'אמא מכפילה את החלק לנתינה';
+  document.getElementById('dvGo').disabled = allocTotal()<=0;
+}
+function confirmDivide(){
+  const total=allocTotal();
+  if(total<=0) return;
+  JARS.forEach(j=>{
+    const a=alloc[j.key]||0; if(a<=0) return;
+    state.jars[j.key]+=a; addLog(j.key,'חולק מהארנק',a,'');
+    if(j.key==='short'||j.key==='long'){ state.principal[j.key]=r2((state.principal[j.key]||0)+a); }
+    if(j.key==='long' && !state.longStart){ state.longStart=Date.now(); }
+    if(j.match){ state.jars[j.key]+=a; addLog(j.key,'אמא הכפילה 💛',a,'התאמה'); }
+  });
+  state.wallet=r2(state.wallet-total);
+  Store.save(state); celebrate();
+  toast(state.wallet>0?`חולקו ${fmt(total)} · נשארו ${fmt(state.wallet)} בארנק`:`כל הכסף חולק! 🎉`);
+  goHome();
+}
+
+/* -------- view switch -------- */
+function show(v){ ['home','detail','divide'].forEach(id=>document.getElementById(id).style.display = id===v?'block':'none'); const el=document.getElementById(v); el.classList.remove('view-enter'); void el.offsetWidth; el.classList.add('view-enter'); window.scrollTo(0,0); }
+function goHome(){ view='home'; current=null; logLimit=8; show('home'); renderHome(); }
+function refresh(){ if(view==='home') renderHome(); else if(view==='detail') renderDetail(); }
+
+/* -------- modal (income / withdraw) -------- */
+let modal={mode:null,jar:null};
+const scrim=document.getElementById('scrim');
+function openIncome(){
+  modal={mode:'income',jar:null};
+  document.getElementById('mEmoji').textContent='💰';
+  document.getElementById('mTitle').textContent='קיבלתי כסף';
+  document.getElementById('mLabel').textContent='כמה כסף נכנס?';
+  document.getElementById('amtInput').value=''; document.getElementById('err').textContent='';
+  document.getElementById('reasonWrap').style.display='block';
+  document.getElementById('reasonLabel').textContent='מאיפה הכסף? (לא חובה)';
+  const ri=document.getElementById('reasonInput'); ri.value=''; ri.placeholder='לדוגמה: דמי כיס, יום הולדת';
+  const ok=document.getElementById('okBtn'); ok.style.background='#6c5ce7'; ok.textContent='נכנס לארנק';
+  document.getElementById('taxNote').style.display='none';
+  buildChips(); scrim.classList.add('on'); setTimeout(()=>document.getElementById('amtInput').focus(),120);
+}
+function openWithdraw(jarKey){
+  const j=JM[jarKey]; modal={mode:'withdraw',jar:jarKey};
+  document.getElementById('mEmoji').textContent=j.emoji;
+  document.getElementById('mTitle').textContent='להוציא מ'+j.name;
+  document.getElementById('mLabel').textContent='כמה שקלים?';
+  document.getElementById('amtInput').value=''; document.getElementById('err').textContent='';
+  document.getElementById('reasonWrap').style.display='block';
+  document.getElementById('reasonLabel').textContent=jarKey==='give'?'למי נתנו? (כדי שיהיה ברור)':'על מה? (כדי שיהיה ברור)';
+  const ri=document.getElementById('reasonInput'); ri.value=''; ri.placeholder=jarKey==='give'?'למי / למה':'לדוגמה: קניתי ספר';
+  const ok=document.getElementById('okBtn'); ok.style.background=j.hex; ok.textContent='מוציאים';
+  buildChips(); updateTaxNote(); scrim.classList.add('on'); setTimeout(()=>document.getElementById('amtInput').focus(),120);
+}
+function buildChips(){ const chips=document.getElementById('chips'); chips.innerHTML=''; [1,5,10,20,50].forEach(v=>{const b=document.createElement('button'); b.textContent='+'+v; b.onclick=()=>{const a=document.getElementById('amtInput'); a.value=(parseFloat(a.value)||0)+v; updateTaxNote();}; chips.appendChild(b);}); }
+function closeModal(){ scrim.classList.remove('on'); }
+function confirmModal(){
+  const v=r2(parseFloat(document.getElementById('amtInput').value)); const err=document.getElementById('err');
+  if(!(v>0)){ err.textContent='כתבו סכום גדול מ‑0'; return; }
+  if(modal.mode==='income'){
+    const note=document.getElementById('reasonInput').value.trim();
+    state.wallet=r2(state.wallet+v); state.received=r2((state.received||0)+v);
+    addLog('wallet','קיבלתי כסף',v,note);
+    Store.save(state); closeModal(); toast(`נכנסו ${fmt(v)} לארנק — עכשיו אפשר לחלק ✂️`); refresh();
+  }else{
+    const jar=modal.jar; const note=document.getElementById('reasonInput').value.trim();
+    if(!note){ err.textContent='כתבו על מה — שיהיה ברור 🙂'; return; }
+    const bal=state.jars[jar];
+    const early=(jar==='long' && isLongEarly());
+    let tax=0, interestPortion=0;
+    if(early){ const c=taxCalc('long',v); tax=c.tax; interestPortion=c.interestPortion; }
+    const debit=r2(v+tax);
+    if(debit>bal+1e-9){ err.textContent = early ? ('אין מספיק למשיכה + מס. אפשר למשוך עד '+fmt(maxReceivable('long'))) : 'אין מספיק כסף בצנצנת הזו'; return; }
+    if(jar==='short'||jar==='long'){
+      const ip = early ? interestPortion : r2(v*(bal>0?jarGains(jar)/bal:0));
+      const principalPortion = r2(v-ip);
+      state.jars[jar]=r2(bal-debit);
+      state.principal[jar]=Math.max(0, Math.min(state.jars[jar], r2((state.principal[jar]||0)-principalPortion)));
+      addLog(jar,'הוצאה',-v,note);
+      if(tax>0) addLog(jar,'מס 25% (משיכה מוקדמת)',-tax,'מס על הרווח');
+      if(jar==='long' && state.jars.long<=0.0001){ state.jars.long=0; state.principal.long=0; state.longStart=null; }
+    }else{
+      state.jars[jar]=r2(bal-v);
+      addLog(jar, jar==='give'?'נתינה':'הוצאה', -v, note);
+    }
+    Store.save(state); closeModal();
+    toast(tax>0 ? `יצאו ${fmt(v)} + מס ${fmt(tax)} = ${fmt(debit)}` : `יצאו ${fmt(v)} — ${note}`);
+    refresh();
+  }
+}
+function updateTaxNote(){
+  const note=document.getElementById('taxNote');
+  if(modal.mode==='withdraw' && modal.jar==='long' && isLongEarly()){
+    const v=parseFloat(document.getElementById('amtInput').value)||0;
+    if(v>0){ const c=taxCalc('long',v);
+      note.innerHTML=`מתוך ${fmt(v)} הרווח הוא כ‑${fmt(c.interestPortion)} · מס 25%: <b>${fmt(c.tax)}</b><br>ירד מהצנצנת: <b>${fmt(v+c.tax)}</b> · תקבל ביד: <b>${fmt(v)}</b>`;
+    }else{ note.innerHTML='⚠️ משיכה לפני שנה → 25% מס על חלק הרווח'; }
+    note.style.display='block';
+  }else{ note.style.display='none'; }
+}
+
+/* -------- interest -------- */
+function giveInterest(){
+  const now=new Date(), mk=monthKey(now), ml=monthLabel(now);
+  if(state.lastInterest===mk){ if(!confirm('כבר ניתנה ריבית של '+ml+'. לתת שוב?')) return; }
+  const sGain=r2(state.jars.short*0.05), lGain=r2(state.jars.long*0.10);
+  if(sGain<=0&&lGain<=0){ toast('כדי לקבל ריבית צריך כסף בחיסכון או בהשקעה 🙂'); return; }
+  if(sGain>0){ state.jars.short=r2(state.jars.short+sGain); addLog('short','ריבית של '+ml+' (5%)',sGain,''); }
+  if(lGain>0){ state.jars.long=r2(state.jars.long+lGain); addLog('long','ריבית של '+ml+' (10%)',lGain,''); }
+  state.lastInterest=mk; Store.save(state); celebrate(); toast(`🎉 ריבית ${ml}: חיסכון +${fmt(sGain)} · השקעה +${fmt(lGain)}`); refresh();
+}
+
+/* -------- delight -------- */
+let tT; function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('on'); clearTimeout(tT); tT=setTimeout(()=>t.classList.remove('on'),2800); }
+function celebrate(){ const b=document.getElementById('burst'),em=['🪙','✨','💛','🌟','🎉']; for(let i=0;i<22;i++){const s=document.createElement('span'); s.className='conf'; s.textContent=em[i%em.length]; s.style.left=Math.random()*100+'vw'; s.style.fontSize=(16+Math.random()*16)+'px'; s.style.animationDelay=(Math.random()*.3)+'s'; b.appendChild(s); setTimeout(()=>s.remove(),1800);} }
+
+/* -------- events -------- */
+document.getElementById('tiles').addEventListener('click',e=>{ const t=e.target.closest('[data-jar]'); if(t) openDetail(t.dataset.jar); });
+document.getElementById('incomeBtn').onclick=openIncome;
+document.getElementById('splitBtn').onclick=openDivide;
+document.getElementById('backBtn').onclick=goHome;
+document.getElementById('backBtn2').onclick=goHome;
+document.getElementById('dSubBtn').onclick=()=>openWithdraw(current);
+document.getElementById('dvList').addEventListener('click',e=>{ const inc=e.target.closest('[data-inc]'), dec=e.target.closest('[data-dec]'); if(inc) setAlloc(inc.dataset.inc,(alloc[inc.dataset.inc]||0)+5); if(dec) setAlloc(dec.dataset.dec,(alloc[dec.dataset.dec]||0)-5); });
+document.getElementById('dvList').addEventListener('input',e=>{ const inp=e.target.closest('[data-inp]'); if(inp) setAlloc(inp.dataset.inp, parseFloat(inp.value)); });
+document.getElementById('dvEven').onclick=()=>{ const each=Math.floor(state.wallet/4); JARS.forEach(j=>setAlloc(j.key,each)); };
+document.getElementById('dvGo').onclick=confirmDivide;
+document.getElementById('okBtn').onclick=confirmModal;
+document.getElementById('cancelBtn').onclick=closeModal;
+scrim.addEventListener('click',e=>{ if(e.target===scrim) closeModal(); });
+document.getElementById('amtInput').addEventListener('keydown',e=>{ if(e.key==='Enter') confirmModal(); });
+document.getElementById('amtInput').addEventListener('input',updateTaxNote);
+document.getElementById('reasonInput').addEventListener('keydown',e=>{ if(e.key==='Enter') confirmModal(); });
+document.getElementById('interestBtn').onclick=giveInterest;
+document.getElementById('nameInput').addEventListener('input',e=>{ state.name=e.target.value.trim(); document.getElementById('titleName').textContent=state.name||'שלי'; Store.save(state); });
+document.getElementById('gear').onclick=()=>{ document.getElementById('setScrim').classList.add('on'); };
+document.getElementById('setClose').onclick=()=>document.getElementById('setScrim').classList.remove('on');
+document.getElementById('setScrim').addEventListener('click',e=>{ if(e.target.id==='setScrim') e.currentTarget.classList.remove('on'); });
+document.getElementById('btnBackup').onclick=()=>{
+  try{ const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+    a.download='גיבוי-הקופות-'+new Date().toISOString().slice(0,10)+'.json'; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href),1500); toast('הגיבוי נשמר 📤');
+  }catch(e){ toast('לא הצלחתי לשמור גיבוי'); }
+};
+document.getElementById('btnRestore').onclick=()=>document.getElementById('importFile').click();
+document.getElementById('importFile').onchange=e=>{
+  const f=e.target.files&&e.target.files[0]; if(!f) return;
+  const rdr=new FileReader();
+  rdr.onload=()=>{ try{
+    const data=JSON.parse(rdr.result);
+    if(!data||typeof data!=='object'||!data.jars) throw 0;
+    state=data;
+    state.jars=Object.assign({treats:0,short:0,long:0,give:0},state.jars||{});
+    state.log=state.log||[]; if(typeof state.wallet!=='number') state.wallet=0;
+    if(!state.principal) state.principal={short:0,long:0};
+    Store.save(state); document.getElementById('setScrim').classList.remove('on'); goHome(); toast('הנתונים שוחזרו 📥');
+  }catch(err){ toast('הקובץ לא תקין'); } e.target.value=''; };
+  rdr.readAsText(f);
+};
+document.getElementById('btnReset').onclick=()=>{ if(confirm('למחוק הכול ולהתחיל מאפס? כל הכסף והיומן יימחקו ואי אפשר לבטל.')){ state=fresh(); Store.save(state); document.getElementById('setScrim').classList.remove('on'); goHome(); toast('התחלנו מחדש 🌱'); } };
+
+/* -------- PWA: install + durable storage -------- */
+try{ if(navigator.storage && navigator.storage.persist) navigator.storage.persist(); }catch(e){}
+if('serviceWorker' in navigator && (location.protocol==='https:'||location.protocol==='http:')){
+  window.addEventListener('load',()=>{ navigator.serviceWorker.register('./sw.js').catch(()=>{}); });
+}
+
+/* -------- boot -------- */
+(async()=>{
+  const saved=await Store.load(); state=saved||fresh();
+  state.jars=Object.assign({treats:0,short:0,long:0,give:0},state.jars||{}); state.log=state.log||[];
+  if(typeof state.wallet!=='number') state.wallet=0;
+  if(typeof state.received!=='number'){ state.received = (typeof state.totalIn==='number')?state.totalIn : state.log.reduce((s,e)=>s+(e.amount>0?e.amount:0),0); }
+  if(!state.principal){ state.principal={short:0,long:0}; ['short','long'].forEach(k=>{ const g=earnedInterest(k); state.principal[k]=r2(Math.max(0, state.jars[k]-g)); }); }
+  if(state.longStart===undefined){ const firstLong=[...state.log].reverse().find(e=>e.jar==='long' && e.amount>0); state.longStart = state.jars.long>0 ? (firstLong?firstLong.t:Date.now()) : null; }
+  goHome();
+})();
+</script>
+</body>
+</html>
