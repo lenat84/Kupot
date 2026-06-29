@@ -80,6 +80,13 @@
   .received{text-align:center; color:var(--ink-soft); font-size:13.5px; margin-bottom:6px;}
   .received b{font-family:'Varela Round',sans-serif; color:var(--treats); font-size:15px;}
 
+  .backupCard{background:#fff7e6; border:2px solid #ffd98a; border-radius:var(--radius); box-shadow:var(--shadow); padding:16px 18px; margin-bottom:14px;}
+  .backupCard .bc-t{font-family:'Varela Round',sans-serif; font-size:16px;}
+  .backupCard .bc-s{font-size:12.5px; color:var(--ink-soft); margin-top:4px; line-height:1.5;}
+  .backupCard .bc-btns{display:flex; gap:8px; margin-top:12px;}
+  .backupCard .bc-go{flex:1; border:none; background:var(--treats); color:#fff; font-family:'Varela Round',sans-serif; font-size:15px; padding:12px; border-radius:14px; cursor:pointer;}
+  .backupCard .bc-later{flex:none; border:none; background:#f4f2fa; color:var(--ink-soft); font-family:'Varela Round',sans-serif; font-size:14px; padding:12px 16px; border-radius:14px; cursor:pointer;}
+  .backupCard .bc-go:active,.backupCard .bc-later:active{transform:scale(.96);}
   .foot{text-align:center; color:var(--ink-soft); font-size:11.5px; margin-top:14px; line-height:1.6;}
 
   /* back btn shared */
@@ -207,8 +214,17 @@
       <button class="ic-btn" id="interestBtn">🎉 לתת ריבית</button>
     </div>
 
+    <div class="backupCard" id="backupCard" style="display:none;">
+      <div class="bc-t">📤 כדאי לגבות את הנתונים</div>
+      <div class="bc-s" id="backupSub">שמרו קובץ גיבוי ל-Drive או למייל — ככה הכסף לא יאבד גם אם מנקים את הדפדפן.</div>
+      <div class="bc-btns">
+        <button class="bc-go" id="backupNowBtn">גבה עכשיו</button>
+        <button class="bc-later" id="backupLaterBtn">אחר כך</button>
+      </div>
+    </div>
+
     <div class="received">💰 כסף שקיבלת בסך הכל: <b id="receivedAmt">0 ₪</b></div>
-    <div class="foot">💾 הכסף נשמר אוטומטית במכשיר הזה.<br>אפשר להוריד את הקובץ — הוא יעבוד וישמור גם בלי אינטרנט.</div>
+    <div class="foot">💾 הכסף נשמר אוטומטית במכשיר הזה.<br>אם מנקים את זיכרון הדפדפן הנתונים נמחקים — לכן כדאי לגבות קובץ (⚙️ הגדרות) ולשמור אותו ב-Drive או במייל.</div>
   </div>
 
   <!-- ===== DETAIL ===== -->
@@ -319,6 +335,20 @@ function maxReceivable(jar){ const bal=state.jars[jar]; const f=bal>0?jarGains(j
 function earnedMatch(jar){ return r2(state.log.filter(e=>e.jar===jar && e.note==='התאמה').reduce((s,e)=>s+e.amount,0)); }
 function incomeTotal(){ return r2(state.log.filter(e=>e.jar==='wallet' && e.amount>0).reduce((s,e)=>s+e.amount,0)); }
 
+/* -------- backup reminder -------- */
+const BACKUP_REMIND_MS=7*24*60*60*1000;
+let backupSnoozed=false;
+function hasData(){ return state.wallet>0 || state.log.length>0 || Object.values(state.jars).some(v=>v>0); }
+function updateBackupReminder(){
+  const card=document.getElementById('backupCard'); if(!card) return;
+  const last=state.lastBackup||0;
+  const due=hasData() && !backupSnoozed && (Date.now()-last>BACKUP_REMIND_MS);
+  card.style.display=due?'block':'none';
+  if(due) document.getElementById('backupSub').textContent = last
+    ? 'עברו כמה ימים מהגיבוי האחרון. שמרו קובץ עדכני ל-Drive או למייל — ככה הכסף לא יאבד אם מנקים את הדפדפן.'
+    : 'עדיין לא גיביתם. שמרו קובץ ל-Drive או למייל — ככה הכסף לא יאבד גם אם מנקים את הדפדפן.';
+}
+
 /* -------- HOME -------- */
 function renderHome(){
   document.getElementById('titleName').textContent=state.name||'שלי';
@@ -340,6 +370,7 @@ function renderHome(){
   document.getElementById('icTitle').textContent='ריבית של '+lbl;
   if(done){ card.classList.add('done'); document.getElementById('icSub').textContent='✓ כבר ניתנה החודש'; document.getElementById('interestBtn').textContent='ניתנה ✓'; }
   else{ card.classList.remove('done'); document.getElementById('icSub').textContent='5% לחיסכון · 10% להשקעה'; document.getElementById('interestBtn').textContent='🎉 לתת ריבית'; }
+  updateBackupReminder();
 }
 
 /* -------- DETAIL -------- */
@@ -544,13 +575,20 @@ document.getElementById('nameInput').addEventListener('input',e=>{ state.name=e.
 document.getElementById('gear').onclick=()=>{ document.getElementById('setScrim').classList.add('on'); };
 document.getElementById('setClose').onclick=()=>document.getElementById('setScrim').classList.remove('on');
 document.getElementById('setScrim').addEventListener('click',e=>{ if(e.target.id==='setScrim') e.currentTarget.classList.remove('on'); });
-document.getElementById('btnBackup').onclick=()=>{
+function doBackup(){
   try{ const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
     const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
     a.download='גיבוי-הקופות-'+new Date().toISOString().slice(0,10)+'.json'; document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(()=>URL.revokeObjectURL(a.href),1500); toast('הגיבוי נשמר 📤');
-  }catch(e){ toast('לא הצלחתי לשמור גיבוי'); }
-};
+    setTimeout(()=>URL.revokeObjectURL(a.href),1500);
+    state.lastBackup=Date.now(); Store.save(state);
+    document.getElementById('setScrim').classList.remove('on');
+    if(view==='home') renderHome();
+    toast('הגיבוי נשמר 📤'); return true;
+  }catch(e){ toast('לא הצלחתי לשמור גיבוי'); return false; }
+}
+document.getElementById('btnBackup').onclick=doBackup;
+document.getElementById('backupNowBtn').onclick=doBackup;
+document.getElementById('backupLaterBtn').onclick=()=>{ backupSnoozed=true; document.getElementById('backupCard').style.display='none'; };
 document.getElementById('btnRestore').onclick=()=>document.getElementById('importFile').click();
 document.getElementById('importFile').onchange=e=>{
   const f=e.target.files&&e.target.files[0]; if(!f) return;
