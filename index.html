@@ -230,6 +230,15 @@
   .cadPick button{flex:1; border:2px solid var(--line); background:#fff; border-radius:14px; padding:12px; font-family:'Varela Round',sans-serif; font-size:15px; cursor:pointer; color:var(--ink);}
   .cadPick button.on{border-color:var(--long); background:var(--long-l); color:var(--long);}
   .cadPick button:active{transform:scale(.96);}
+  .dayNav{display:flex; align-items:center; justify-content:space-between; gap:10px; background:#fff; border-radius:var(--radius); box-shadow:var(--shadow); padding:8px 10px; margin-bottom:16px;}
+  .dayArrow{border:none; background:#f1eef9; color:var(--long); width:42px; height:42px; border-radius:50%; font-size:22px; font-weight:700; cursor:pointer; flex:none; line-height:1;}
+  .dayArrow:disabled{opacity:.32; cursor:default;}
+  .dayArrow:not(:disabled):active{transform:scale(.9);}
+  .dayLabel{flex:1; text-align:center; font-family:'Varela Round',sans-serif; font-size:17px; color:var(--ink);}
+  .weekHead{font-family:'Varela Round',sans-serif; font-size:15px; color:var(--ink-soft); margin:2px 4px 10px;}
+  .choreRow.ro{opacity:.9;}
+  .stMissed{display:block; font-size:12.5px; color:var(--ink-soft); background:#f4f2fa; border-radius:12px; padding:8px 12px; white-space:nowrap; text-align:center;}
+  .stDoneRO{display:block; font-size:13px; color:var(--short); text-align:center; white-space:nowrap; font-family:'Varela Round',sans-serif;}
 
   .toast{position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(20px); background:#2b2b3c; color:#fff; padding:15px 22px; border-radius:18px; font-weight:600; font-size:15px; box-shadow:var(--shadow); opacity:0; pointer-events:none; transition:.35s; z-index:80; max-width:90vw; text-align:center;}
   .toast.on{opacity:1; transform:translateX(-50%) translateY(0);}
@@ -319,8 +328,14 @@
       <div class="brand"><span class="logo">🧺</span><h1>מטלות בית</h1></div>
       <button class="gear" id="choreAddTop" title="מטלה חדשה">➕</button>
     </div>
+    <div class="dayNav">
+      <button class="dayArrow" id="dayPrev" title="יום קודם">›</button>
+      <div class="dayLabel" id="dayLabel">היום</div>
+      <button class="dayArrow" id="dayNext" title="יום הבא">‹</button>
+    </div>
     <div id="pendingBox"></div>
     <div class="choreList" id="choreList"></div>
+    <div id="weeklyBox"></div>
     <button class="addChore" id="addChoreBtn">➕ מטלה חדשה</button>
     <div class="foot">🧺 הילד/ה מסמן/ת שביצע/ה מטלה, וההורה מאשר/ת — ואז הכסף נכנס לארנק לחלוקה לצנצנות.</div>
   </div>
@@ -430,12 +445,13 @@ function monthLabel(d){ return HMONTHS[d.getMonth()]+' '+d.getFullYear(); }
 /* -------- state -------- */
 let state=null, view='home', current=null, logLimit=8, alloc={};
 let choreDraft={id:null,emoji:'✅',cadence:'daily'};
+let choreDay=new Date();
 const CHORE_EMOJIS=['✅','🛏️','🍽️','📚','🧹','🧺','🗑️','🚿','🪥','🐕','🌱','🧸'];
 let cid=0; function newChoreId(){ return 'c'+Date.now().toString(36)+(cid++).toString(36); }
 function seedChores(){ return [
-  {id:newChoreId(),name:'לסדר את המיטה',   emoji:'🛏️',amount:2,cadence:'daily', pendingAt:null,lastApproved:null},
-  {id:newChoreId(),name:'לפנות את השולחן', emoji:'🍽️',amount:3,cadence:'daily', pendingAt:null,lastApproved:null},
-  {id:newChoreId(),name:'שיעורי בית',      emoji:'📚',amount:5,cadence:'daily', pendingAt:null,lastApproved:null},
+  {id:newChoreId(),name:'לסדר את המיטה',   emoji:'🛏️',amount:2,cadence:'daily', pendingAt:null,lastApproved:null,history:{}},
+  {id:newChoreId(),name:'לפנות את השולחן', emoji:'🍽️',amount:3,cadence:'daily', pendingAt:null,lastApproved:null,history:{}},
+  {id:newChoreId(),name:'שיעורי בית',      emoji:'📚',amount:5,cadence:'daily', pendingAt:null,lastApproved:null,history:{}},
 ]; }
 function fresh(){ return {name:'',wallet:0,jars:{treats:0,short:0,long:0,give:0},principal:{short:0,long:0},longStart:null,received:0,lastInterest:null,log:[],chores:seedChores()}; }
 function r2(n){ return Math.round(n*100)/100; }
@@ -455,13 +471,18 @@ function incomeTotal(){ return r2(state.log.filter(e=>e.jar==='wallet' && e.amou
 function dayKey(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
 function weekKey(d){ const t=new Date(d.getFullYear(),d.getMonth(),d.getDate()); const day=(t.getDay()+6)%7; t.setDate(t.getDate()-day+3); const first=new Date(t.getFullYear(),0,4); const week=1+Math.round(((t-first)/86400000-3+((first.getDay()+6)%7))/7); return t.getFullYear()+'-W'+String(week).padStart(2,'0'); }
 function periodKey(cadence,d){ return cadence==='weekly'?weekKey(d):dayKey(d); }
-function choreStatus(c){
-  if(c.pendingAt) return 'pending';
-  if(c.lastApproved){ const now=new Date(); return periodKey(c.cadence,new Date(c.lastApproved))===periodKey(c.cadence,now) ? 'done' : 'available'; }
-  return 'available';
+function migrateChores(){ if(!Array.isArray(state.chores)) state.chores=[]; state.chores.forEach(c=>{ if(!c.history){ c.history={}; if(c.lastApproved) c.history[periodKey(c.cadence,new Date(c.lastApproved))]=c.lastApproved; } }); }
+function isPendingNow(c){ return !!c.pendingAt && periodKey(c.cadence,new Date(c.pendingAt))===periodKey(c.cadence,new Date()); }
+function choreStatusOn(c,date,isToday){
+  const key=periodKey(c.cadence,date);
+  if(isToday && isPendingNow(c)) return 'pending';
+  if(c.history && c.history[key]) return 'done';
+  return isToday ? 'available' : 'missed';
 }
 function choreResetLabel(c){ return c.cadence==='weekly' ? 'מתחדש בשבוע הבא' : 'מתחדש מחר'; }
-function pendingChores(){ return state.chores.filter(c=>c.pendingAt); }
+function pendingChores(){ return state.chores.filter(isPendingNow); }
+function sameDay(a,b){ return dayKey(a)===dayKey(b); }
+function dayNavLabel(d){ const today=new Date(); if(sameDay(d,today)) return 'היום'; const y=new Date(today); y.setDate(y.getDate()-1); if(sameDay(d,y)) return 'אתמול'; return d.toLocaleDateString('he-IL',{weekday:'long',day:'numeric',month:'long'}); }
 
 /* -------- backup reminder -------- */
 const BACKUP_REMIND_MS=7*24*60*60*1000;
@@ -587,39 +608,48 @@ function confirmDivide(){
 }
 
 /* -------- CHORES -------- */
-function openChores(){ view='chores'; current=null; show('chores'); renderChores(); }
-function renderChores(){
-  const pendBox=document.getElementById('pendingBox');
-  const pend=pendingChores();
-  if(pend.length){
-    pendBox.innerHTML=`<div class="pendCard"><div class="pendTitle">✋ מחכה לאישור הורה</div>`+
-      pend.map(c=>`<div class="pendRow"><div class="pn">${c.emoji||'✅'} ${esc(c.name)}</div><div class="pa">+${fmt(c.amount)}</div><div class="pb"><button class="ok" data-approve="${c.id}">✓ אישור</button><button class="no" data-reject="${c.id}">✗ עוד לא</button></div></div>`).join('')+
-      `</div>`;
-  } else pendBox.innerHTML='';
-
-  const list=document.getElementById('choreList');
-  if(!state.chores.length){ list.innerHTML=`<div class="choreEmpty">עדיין אין מטלות 🧺<br>הוסיפו מטלה כדי להתחיל להרוויח כסף לצנצנות.</div>`; return; }
-  list.innerHTML=state.chores.map(c=>{
-    const st=choreStatus(c), cad=c.cadence==='weekly'?'כל שבוע':'כל יום';
-    let ctl;
-    if(st==='pending') ctl=`<span class="stPend">⏳ מחכה לאישור</span>`;
-    else if(st==='done') ctl=`<span class="stDone">✓ כל הכבוד<br><small>${choreResetLabel(c)}</small></span>`;
-    else ctl=`<button class="doneBtn" data-done="${c.id}">עשיתי! 🙌</button>`;
-    return `<div class="choreRow">
-      <div class="choreEm">${c.emoji||'✅'}</div>
-      <div class="choreInfo"><div class="choreName">${esc(c.name)}</div><div class="choreMeta"><span class="rw">+${fmt(c.amount)}</span><span class="badge">${cad}</span></div></div>
-      <div class="choreCtl">${ctl}</div>
-      <button class="choreEdit" data-edit="${c.id}">✏️</button>
-    </div>`;
-  }).join('');
+function openChores(){ view='chores'; current=null; choreDay=new Date(); choreDay.setHours(0,0,0,0); show('chores'); renderChores(); }
+function choreDayShift(delta){ const d=new Date(choreDay); d.setDate(d.getDate()+delta); d.setHours(0,0,0,0); const today=new Date(); today.setHours(0,0,0,0); if(d>today) return; choreDay=d; renderChores(); }
+function choreRowHTML(c,st,isToday){
+  const cad=c.cadence==='weekly'?'כל שבוע':'כל יום';
+  let ctl;
+  if(st==='pending') ctl=`<span class="stPend">⏳ מחכה לאישור</span>`;
+  else if(st==='done') ctl=isToday?`<span class="stDone">✓ כל הכבוד<br><small>${choreResetLabel(c)}</small></span>`:`<span class="stDoneRO">✓ בוצע</span>`;
+  else if(st==='missed') ctl=`<span class="stMissed">לא בוצע</span>`;
+  else ctl=`<button class="doneBtn" data-done="${c.id}">עשיתי! 🙌</button>`;
+  const edit=isToday?`<button class="choreEdit" data-edit="${c.id}">✏️</button>`:'';
+  return `<div class="choreRow${isToday?'':' ro'}">
+    <div class="choreEm">${c.emoji||'✅'}</div>
+    <div class="choreInfo"><div class="choreName">${esc(c.name)}</div><div class="choreMeta"><span class="rw">+${fmt(c.amount)}</span><span class="badge">${cad}</span></div></div>
+    <div class="choreCtl">${ctl}</div>
+    ${edit}
+  </div>`;
 }
-function markChoreDone(id){ const c=state.chores.find(x=>x.id===id); if(!c||choreStatus(c)!=='available') return; c.pendingAt=Date.now(); Store.save(state); renderChores(); toast('נשלח לאישור הורה ✋'); }
-function approveChore(id){ const c=state.chores.find(x=>x.id===id); if(!c||!c.pendingAt) return;
+function renderChores(){
+  const isToday=sameDay(choreDay,new Date());
+  document.getElementById('dayLabel').textContent=dayNavLabel(choreDay);
+  document.getElementById('dayNext').disabled=isToday;
+  document.getElementById('addChoreBtn').style.display=isToday?'block':'none';
+
+  const pendBox=document.getElementById('pendingBox');
+  const pend=isToday?pendingChores():[];
+  pendBox.innerHTML=pend.length?(`<div class="pendCard"><div class="pendTitle">✋ מחכה לאישור הורה</div>`+
+    pend.map(c=>`<div class="pendRow"><div class="pn">${c.emoji||'✅'} ${esc(c.name)}</div><div class="pa">+${fmt(c.amount)}</div><div class="pb"><button class="ok" data-approve="${c.id}">✓ אישור</button><button class="no" data-reject="${c.id}">✗ עוד לא</button></div></div>`).join('')+`</div>`):'';
+
+  const list=document.getElementById('choreList'), wBox=document.getElementById('weeklyBox');
+  if(!state.chores.length){ list.innerHTML=`<div class="choreEmpty">עדיין אין מטלות 🧺<br>הוסיפו מטלה כדי להתחיל להרוויח כסף לצנצנות.</div>`; wBox.innerHTML=''; return; }
+  const daily=state.chores.filter(c=>c.cadence!=='weekly'), weekly=state.chores.filter(c=>c.cadence==='weekly');
+  list.innerHTML=daily.length?daily.map(c=>choreRowHTML(c,choreStatusOn(c,choreDay,isToday),isToday)).join(''):`<div class="choreEmpty">אין מטלות יומיות</div>`;
+  wBox.innerHTML=weekly.length?(`<div class="weekHead">🗓️ משימות השבוע</div>`+weekly.map(c=>choreRowHTML(c,choreStatusOn(c,choreDay,isToday),isToday)).join('')):'';
+}
+function markChoreDone(id){ if(!sameDay(choreDay,new Date())) return; const c=state.chores.find(x=>x.id===id); if(!c||choreStatusOn(c,new Date(),true)!=='available') return; c.pendingAt=Date.now(); Store.save(state); renderChores(); toast('נשלח לאישור הורה ✋'); }
+function approveChore(id){ const c=state.chores.find(x=>x.id===id); if(!c||!isPendingNow(c)) return;
   state.wallet=r2(state.wallet+c.amount); addLog('wallet','מטלה: '+c.name,c.amount,'');
-  c.lastApproved=Date.now(); c.pendingAt=null; Store.save(state); celebrate();
+  const now=Date.now(); c.history=c.history||{}; c.history[periodKey(c.cadence,new Date(now))]=now;
+  c.lastApproved=now; c.pendingAt=null; Store.save(state); celebrate();
   toast(`אושר! +${fmt(c.amount)} נכנסו לארנק 💰`); renderChores();
 }
-function rejectChore(id){ const c=state.chores.find(x=>x.id===id); if(!c||!c.pendingAt) return; c.pendingAt=null; Store.save(state); renderChores(); toast('לא אושר — אפשר לנסות שוב 🙂'); }
+function rejectChore(id){ const c=state.chores.find(x=>x.id===id); if(!c||!isPendingNow(c)) return; c.pendingAt=null; Store.save(state); renderChores(); toast('לא אושר — אפשר לנסות שוב 🙂'); }
 function buildEmojiPick(){ const box=document.getElementById('emojiPick'); box.innerHTML='';
   CHORE_EMOJIS.forEach(em=>{ const b=document.createElement('button'); b.textContent=em; if(em===choreDraft.emoji) b.className='on';
     b.onclick=()=>{ choreDraft.emoji=em; buildEmojiPick(); document.getElementById('choreEmojiPreview').textContent=em; }; box.appendChild(b); });
@@ -785,6 +815,8 @@ document.getElementById('navScrim').addEventListener('click',e=>{ const it=e.tar
 /* chores events */
 document.getElementById('addChoreBtn').onclick=()=>openChoreEdit(null);
 document.getElementById('choreAddTop').onclick=()=>openChoreEdit(null);
+document.getElementById('dayPrev').onclick=()=>choreDayShift(-1);
+document.getElementById('dayNext').onclick=()=>choreDayShift(1);
 document.getElementById('choreList').addEventListener('click',e=>{ const d=e.target.closest('[data-done]'), ed=e.target.closest('[data-edit]'); if(d) markChoreDone(d.dataset.done); else if(ed) openChoreEdit(ed.dataset.edit); });
 document.getElementById('pendingBox').addEventListener('click',e=>{ const ap=e.target.closest('[data-approve]'), rj=e.target.closest('[data-reject]'); if(ap) approveChore(ap.dataset.approve); else if(rj) rejectChore(rj.dataset.reject); });
 document.getElementById('choreCancel').onclick=()=>document.getElementById('choreScrim').classList.remove('on');
@@ -820,7 +852,7 @@ document.getElementById('importFile').onchange=e=>{
     state.jars=Object.assign({treats:0,short:0,long:0,give:0},state.jars||{});
     state.log=state.log||[]; if(typeof state.wallet!=='number') state.wallet=0;
     if(!state.principal) state.principal={short:0,long:0};
-    if(!Array.isArray(state.chores)) state.chores=[];
+    migrateChores();
     Store.save(state); document.getElementById('setScrim').classList.remove('on'); goHome(); toast('הנתונים שוחזרו 📥');
   }catch(err){ toast('הקובץ לא תקין'); } e.target.value=''; };
   rdr.readAsText(f);
@@ -837,7 +869,7 @@ if('serviceWorker' in navigator && (location.protocol==='https:'||location.proto
 (async()=>{
   const saved=await Store.load(); state=saved||fresh();
   state.jars=Object.assign({treats:0,short:0,long:0,give:0},state.jars||{}); state.log=state.log||[];
-  if(!Array.isArray(state.chores)) state.chores=[];
+  migrateChores();
   if(typeof state.wallet!=='number') state.wallet=0;
   if(typeof state.received!=='number'){ state.received = (typeof state.totalIn==='number')?state.totalIn : state.log.reduce((s,e)=>s+(e.amount>0?e.amount:0),0); }
   if(!state.principal){ state.principal={short:0,long:0}; ['short','long'].forEach(k=>{ const g=earnedInterest(k); state.principal[k]=r2(Math.max(0, state.jars[k]-g)); }); }

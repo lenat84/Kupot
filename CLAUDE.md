@@ -8,6 +8,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Beyond the four jars, the child can also earn money via **home chores** (`chores`): a parent-managed list of named chores, each with a fixed reward and a daily/weekly reset. The child marks a chore done → it becomes **pending** → a parent **approves** it, which credits the reward **into the wallet** (so it flows through the normal divide-into-jars lesson). No PIN/gate — trust-based like the rest of the app.
 
+The chores screen is a **day-by-day view**: it opens on today (real Hebrew date via `dayNavLabel()`), and the `‹ ›` nav (`choreDay` state + `choreDayShift()`) pages **backward** through earlier days as a read-only record (no future browsing; marking/approving/editing only on today). Daily chores list under the day; weekly chores get a separate "משימות השבוע" section. Each chore's completions are stored in a per-period `history` map (keyed by `dayKey()`/`weekKey()`); `choreStatusOn(chore, date, isToday)` derives available/pending/done/missed. `migrateChores()` backfills `history` from the old single `lastApproved` for existing/imported states.
+
 ## Architecture
 
 There is **no build system, no framework, no dependencies, and no tests**. The entire application is a single file: `index.html` (~850 lines) containing inline CSS and inline vanilla JS. Web fonts load from the Google Fonts CDN; everything else is self-contained.
@@ -16,7 +18,7 @@ Supporting files: `sw.js` (service worker, offline cache), `manifest.webmanifest
 
 ### State model (the core of the app)
 
-- A single global `state` object holds everything; `fresh()` defines its shape: `{name, wallet, jars:{treats,short,long,give}, principal:{short,long}, longStart, log:[...], lastInterest, lastBackup, chores:[...]}`. Each chore is `{id, name, emoji, amount, cadence:'daily'|'weekly', pendingAt, lastApproved}`; `choreStatus()` derives available/pending/done from `pendingAt` + `lastApproved` against `dayKey()`/`weekKey()`.
+- A single global `state` object holds everything; `fresh()` defines its shape: `{name, wallet, jars:{treats,short,long,give}, principal:{short,long}, longStart, log:[...], lastInterest, lastBackup, chores:[...]}`. Each chore is `{id, name, emoji, amount, cadence:'daily'|'weekly', pendingAt, lastApproved, history:{[periodKey]:ts}}`; `history` (keyed by `dayKey()`/`weekKey()`) is the source of truth for per-period completion.
 - Persisted via the `Store` object (`Store.load`/`Store.save`) to **`localStorage`** under key `arba-kupot-v1` (with an optional `window.storage` async layer tried first). This is browser-local — clearing browser data wipes it; the JSON backup/restore in Settings is the only durable escape hatch.
 - `state.log` is the source of truth for derived values. Money only enters jars by *dividing the wallet* — there is no free-add. Derived/calc helpers read the log rather than storing redundant totals: `incomeTotal()`, `earnedInterest(jar)`, `jarGains(jar)`, `earnedMatch(jar)`, `taxCalc(jar,W)`, `maxReceivable(jar)`, `longFreeDate()`/`isLongEarly()`. Prefer extending these over adding new stored fields.
 - Migrations live inline in the boot IIFE at the bottom of the script — it backfills fields (`received`, `principal`, `longStart`) for older saved states. Add new optional fields the same way so existing users' data upgrades cleanly.
