@@ -1,7 +1,7 @@
 /* ארבע הקופות — service worker */
 /* Bump this version on every change to index.html or assets,
    otherwise installed users keep getting the old cached files. */
-const CACHE = 'kupot-v5';
+const CACHE = 'kupot-v6';
 const ASSETS = [
   './',
   './index.html',

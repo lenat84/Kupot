@@ -49,7 +49,10 @@
   .nameRow input:focus{outline:none; border-color:var(--long);}
 
   /* wallet hero */
-  .wallet{background:linear-gradient(135deg,#6c5ce7,#8b7bff); color:#fff; border-radius:var(--radius); box-shadow:var(--shadow); padding:20px 22px; margin-bottom:18px;}
+  .wallet{background:linear-gradient(135deg,#6c5ce7,#8b7bff); color:#fff; border-radius:var(--radius); box-shadow:var(--shadow); padding:20px 22px; margin-bottom:18px; cursor:pointer;}
+  .wallet .wl-row{display:flex; align-items:center; justify-content:space-between; gap:10px;}
+  .wallet .wHist{border:none; background:rgba(255,255,255,.22); color:#fff; font-family:inherit; font-size:12.5px; padding:6px 12px; border-radius:12px; cursor:pointer; flex:none;}
+  .wallet .wHist:active{transform:scale(.94);}
   .wallet .wl{font-size:14px; opacity:.92;}
   .wallet .wa{font-size:40px; font-weight:800; line-height:1.05; margin:2px 0 4px;}
   .wallet .wtip{font-size:12.5px; opacity:.85; min-height:16px;}
@@ -262,8 +265,11 @@
     </div>
     <div class="nameRow"><span>שם הילד/ה:</span><input id="nameInput" placeholder="כתבו כאן" maxlength="14" /></div>
 
-    <div class="wallet">
-      <div class="wl">💰 כסף בארנק — מחכה לחלוקה</div>
+    <div class="wallet" id="walletCard">
+      <div class="wl-row">
+        <div class="wl">💰 כסף בארנק — מחכה לחלוקה</div>
+        <button class="wHist" id="walletHistBtn">📒 היסטוריה</button>
+      </div>
       <div class="wa" id="walletAmt">0 ₪</div>
       <div class="wtip" id="walletTip">קודם רושמים כסף שנכנס, ואז מחלקים לצנצנות.</div>
       <div class="wbtns">
@@ -358,6 +364,15 @@
     <div class="taxNote" id="taxNote" style="display:none;"></div>
     <div class="err" id="err"></div>
     <div class="mactions"><button class="cancel" id="cancelBtn">ביטול</button><button class="ok" id="okBtn">אישור</button></div>
+  </div>
+</div>
+
+<!-- wallet history sheet -->
+<div class="scrim" id="walletScrim">
+  <div class="sheet">
+    <div class="mhead"><span class="em">💰</span><span class="mt">היסטוריית הארנק</span></div>
+    <div class="histBox" id="walletHist"></div>
+    <div class="mactions"><button class="cancel" id="walletHistClose">סגירה</button></div>
   </div>
 </div>
 
@@ -520,6 +535,20 @@ function renderHome(){
   if(done){ card.classList.add('done'); document.getElementById('icSub').textContent='✓ כבר ניתנה החודש'; document.getElementById('interestBtn').textContent='ניתנה ✓'; }
   else{ card.classList.remove('done'); document.getElementById('icSub').textContent='5% לחיסכון · 10% להשקעה'; document.getElementById('interestBtn').textContent='🎉 לתת ריבית'; }
   updateBackupReminder();
+}
+
+/* -------- wallet history -------- */
+function openWalletHistory(){
+  const box=document.getElementById('walletHist');
+  const entries=state.log.filter(e=>e.jar==='wallet' && e.amount>0).slice(0,10);
+  if(!entries.length){ box.innerHTML='<div class="empty">עוד לא נכנס כסף לארנק 🙂<br>לוחצים "קיבלתי כסף" או מאשרים מטלה.</div>'; }
+  else box.innerHTML=entries.map(e=>{
+    const icon=e.label.indexOf('מטלה:')===0?'🧺':'💰';
+    const date=new Date(e.t).toLocaleDateString('he-IL',{day:'numeric',month:'short'});
+    const meta=[date,e.note].filter(Boolean).join(' · ');
+    return `<div class="row"><div class="rmid"><div class="rtitle">${icon} ${esc(e.label)}</div><div class="rmeta">${esc(meta)}</div></div><div class="ramt plus">+${fmt(e.amount)}</div></div>`;
+  }).join('');
+  document.getElementById('walletScrim').classList.add('on');
 }
 
 /* -------- DETAIL -------- */
@@ -792,6 +821,10 @@ function celebrate(){ const b=document.getElementById('burst'),em=['🪙','✨',
 document.getElementById('tiles').addEventListener('click',e=>{ const t=e.target.closest('[data-jar]'); if(t) openDetail(t.dataset.jar); });
 document.getElementById('incomeBtn').onclick=openIncome;
 document.getElementById('splitBtn').onclick=openDivide;
+document.getElementById('walletHistBtn').onclick=openWalletHistory;
+document.getElementById('walletCard').addEventListener('click',e=>{ if(e.target.closest('button')) return; openWalletHistory(); });
+document.getElementById('walletHistClose').onclick=()=>document.getElementById('walletScrim').classList.remove('on');
+document.getElementById('walletScrim').addEventListener('click',e=>{ if(e.target.id==='walletScrim') e.currentTarget.classList.remove('on'); });
 document.getElementById('backBtn').onclick=goHome;
 document.getElementById('backBtn2').onclick=goHome;
 document.getElementById('dSubBtn').onclick=()=>openWithdraw(current);

@@ -25,7 +25,7 @@ Supporting files: `sw.js` (service worker, offline cache), `manifest.webmanifest
 
 ### UI structure
 
-Four views — `home`, `detail`, `divide`, `chores` — are sibling `<div>`s toggled by `show()` driven by the `view` variable; each has a `renderX()` function. `refresh()` re-renders the active view. A right-side (RTL) slide-out **drawer** (`#navScrim`, opened by the `☰` `menuBtn`/`menuBtn2`) switches between the **קופות** section (`home`/`detail`/`divide`) and the **מטלות בית** section (`chores`). All user-facing strings are Hebrew; keep new strings Hebrew and the layout RTL.
+Four views — `home`, `detail`, `divide`, `chores` — are sibling `<div>`s toggled by `show()` driven by the `view` variable; each has a `renderX()` function. Tapping the wallet hero (or its 📒 היסטוריה pill) opens `openWalletHistory()` — a sheet (`#walletScrim`) listing the last 10 wallet money-ins (`jar==='wallet' && amount>0`: both manual income and `מטלה:` chore approvals). `refresh()` re-renders the active view. A right-side (RTL) slide-out **drawer** (`#navScrim`, opened by the `☰` `menuBtn`/`menuBtn2`) switches between the **קופות** section (`home`/`detail`/`divide`) and the **מטלות בית** section (`chores`). All user-facing strings are Hebrew; keep new strings Hebrew and the layout RTL.
 
 ## Running and deploying
 
