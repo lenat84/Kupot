@@ -497,7 +497,7 @@ function choreStatusOn(c,date,isToday){
 function choreResetLabel(c){ return c.cadence==='weekly' ? 'מתחדש בשבוע הבא' : 'מתחדש מחר'; }
 function pendingChores(){ return state.chores.filter(isPendingNow); }
 function sameDay(a,b){ return dayKey(a)===dayKey(b); }
-function dayNavLabel(d){ const today=new Date(); if(sameDay(d,today)) return 'היום'; const y=new Date(today); y.setDate(y.getDate()-1); if(sameDay(d,y)) return 'אתמול'; return d.toLocaleDateString('he-IL',{weekday:'long',day:'numeric',month:'long'}); }
+function dayNavLabel(d){ const today=new Date(); const y=new Date(today); y.setDate(y.getDate()-1); const dm=d.toLocaleDateString('he-IL',{day:'numeric',month:'long'}); if(sameDay(d,today)) return 'היום · '+dm; if(sameDay(d,y)) return 'אתמול · '+dm; return d.toLocaleDateString('he-IL',{weekday:'long',day:'numeric',month:'long'}); }
 
 /* -------- backup reminder -------- */
 const BACKUP_REMIND_MS=7*24*60*60*1000;
