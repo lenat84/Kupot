@@ -6,22 +6,24 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 "ארבע הקופות" (Four Jars) — a Hebrew, RTL, kids' money app delivered as an **installable PWA**. One wallet receives money; the user divides it into four jars: **treats** (`treats`), **short-term savings** (`short`, 5% monthly interest), **long-term investment** (`long`, 10% monthly interest), and **giving** (`give`, parent matches each shekel). The long jar charges 25% tax on gains if withdrawn within a year — modeling real life.
 
+Beyond the four jars, the child can also earn money via **home chores** (`chores`): a parent-managed list of named chores, each with a fixed reward and a daily/weekly reset. The child marks a chore done → it becomes **pending** → a parent **approves** it, which credits the reward **into the wallet** (so it flows through the normal divide-into-jars lesson). No PIN/gate — trust-based like the rest of the app.
+
 ## Architecture
 
-There is **no build system, no framework, no dependencies, and no tests**. The entire application is a single file: `index.html` (~630 lines) containing inline CSS and inline vanilla JS. Web fonts load from the Google Fonts CDN; everything else is self-contained.
+There is **no build system, no framework, no dependencies, and no tests**. The entire application is a single file: `index.html` (~850 lines) containing inline CSS and inline vanilla JS. Web fonts load from the Google Fonts CDN; everything else is self-contained.
 
-Supporting files: `sw.js` (service worker, offline cache), `icon-*.png` / `apple-touch-icon.png` (PWA icons). Note: `index.html` and `sw.js` both reference `manifest.webmanifest`, but that file is **not present in the repo** — recreate it if PWA install metadata needs to work.
+Supporting files: `sw.js` (service worker, offline cache), `manifest.webmanifest` (PWA install metadata), `icon-*.png` / `apple-touch-icon.png` (PWA icons).
 
 ### State model (the core of the app)
 
-- A single global `state` object holds everything; `fresh()` defines its shape: `{name, wallet, jars:{treats,short,long,give}, principal:{short,long}, longStart, log:[...], lastInterest, lastBackup}`.
+- A single global `state` object holds everything; `fresh()` defines its shape: `{name, wallet, jars:{treats,short,long,give}, principal:{short,long}, longStart, log:[...], lastInterest, lastBackup, chores:[...]}`. Each chore is `{id, name, emoji, amount, cadence:'daily'|'weekly', pendingAt, lastApproved}`; `choreStatus()` derives available/pending/done from `pendingAt` + `lastApproved` against `dayKey()`/`weekKey()`.
 - Persisted via the `Store` object (`Store.load`/`Store.save`) to **`localStorage`** under key `arba-kupot-v1` (with an optional `window.storage` async layer tried first). This is browser-local — clearing browser data wipes it; the JSON backup/restore in Settings is the only durable escape hatch.
 - `state.log` is the source of truth for derived values. Money only enters jars by *dividing the wallet* — there is no free-add. Derived/calc helpers read the log rather than storing redundant totals: `incomeTotal()`, `earnedInterest(jar)`, `jarGains(jar)`, `earnedMatch(jar)`, `taxCalc(jar,W)`, `maxReceivable(jar)`, `longFreeDate()`/`isLongEarly()`. Prefer extending these over adding new stored fields.
 - Migrations live inline in the boot IIFE at the bottom of the script — it backfills fields (`received`, `principal`, `longStart`) for older saved states. Add new optional fields the same way so existing users' data upgrades cleanly.
 
 ### UI structure
 
-Three views — `home`, `detail`, `divide` — are sibling `<div>`s toggled by `show()` driven by the `view` variable; each has a `renderX()` function. `refresh()` re-renders the active view. All user-facing strings are Hebrew; keep new strings Hebrew and the layout RTL.
+Four views — `home`, `detail`, `divide`, `chores` — are sibling `<div>`s toggled by `show()` driven by the `view` variable; each has a `renderX()` function. `refresh()` re-renders the active view. A right-side (RTL) slide-out **drawer** (`#navScrim`, opened by the `☰` `menuBtn`/`menuBtn2`) switches between the **קופות** section (`home`/`detail`/`divide`) and the **מטלות בית** section (`chores`). All user-facing strings are Hebrew; keep new strings Hebrew and the layout RTL.
 
 ## Running and deploying
 

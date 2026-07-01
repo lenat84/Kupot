@@ -176,6 +176,61 @@
   .mactions .ok{color:#fff;}
   .mactions button:active{transform:scale(.97);}
 
+  /* DRAWER (side nav) */
+  .scrim.navScrim{align-items:stretch; justify-content:flex-start;}
+  @media(min-width:560px){ .scrim.navScrim{align-items:stretch; padding:0;} }
+  .drawer{background:#fff; width:80%; max-width:300px; height:100%; padding:22px 18px; box-shadow:-10px 0 40px rgba(40,20,80,.2); display:flex; flex-direction:column; gap:10px; overflow-y:auto;}
+  .scrim.navScrim.on .drawer{animation:slideRight .26s cubic-bezier(.22,1,.36,1) both;}
+  @keyframes slideRight{from{transform:translateX(100%);} to{transform:translateX(0);}}
+  .drawerHead{display:flex; align-items:center; gap:8px; font-family:'Varela Round',sans-serif; font-size:20px; margin-bottom:12px; padding:2px;}
+  .drawerHead .logo{font-size:26px;}
+  .navItem{display:flex; align-items:center; gap:14px; width:100%; text-align:right; border:1px solid var(--line); background:#fff; border-radius:18px; padding:16px; cursor:pointer; font-family:inherit; color:var(--ink);}
+  .navItem:active{transform:scale(.98);}
+  .navItem span{font-size:26px; flex:none;}
+  .navItem b{font-family:'Varela Round',sans-serif; font-size:18px;}
+  .navItem.active{border-color:var(--long); background:var(--long-l); color:var(--long);}
+
+  /* CHORES */
+  .chores{display:none;}
+  .pendCard{background:#fff7e6; border:2px solid #ffd98a; border-radius:var(--radius); box-shadow:var(--shadow); padding:14px 16px 6px; margin-bottom:16px;}
+  .pendTitle{font-family:'Varela Round',sans-serif; font-size:16px; margin-bottom:6px;}
+  .pendRow{display:flex; align-items:center; gap:10px; padding:12px 0; border-top:1px solid #ffe6b3;}
+  .pendRow:first-of-type{border-top:none;}
+  .pendRow .pn{flex:1; min-width:0; font-size:15px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .pendRow .pa{font-weight:800; color:var(--short); white-space:nowrap; font-size:15px;}
+  .pendRow .pb{display:flex; gap:6px; flex:none;}
+  .pendRow .pb button{border:none; border-radius:12px; padding:9px 12px; font-family:'Varela Round',sans-serif; font-size:14px; cursor:pointer;}
+  .pendRow .pb .ok{background:var(--short); color:#fff;}
+  .pendRow .pb .no{background:#f4f2fa; color:var(--ink-soft);}
+  .pendRow .pb button:active{transform:scale(.93);}
+  .choreList{display:flex; flex-direction:column; gap:12px; margin-bottom:16px;}
+  .choreRow{background:#fff; border-radius:20px; box-shadow:var(--shadow); padding:14px 14px; display:flex; align-items:center; gap:11px;}
+  .choreEm{font-size:24px; width:48px; height:48px; display:grid; place-items:center; border-radius:15px; flex:none; background:var(--long-l);}
+  .choreInfo{flex:1; min-width:0;}
+  .choreName{font-family:'Varela Round',sans-serif; font-size:16px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .choreMeta{font-size:12.5px; color:var(--ink-soft); margin-top:3px;}
+  .choreMeta .rw{color:var(--short); font-weight:700;}
+  .choreMeta .badge{background:#f1eef9; border-radius:8px; padding:1px 8px; margin-inline-start:6px; font-size:11.5px;}
+  .choreCtl{flex:none;}
+  .doneBtn{border:none; background:var(--long); color:#fff; font-family:'Varela Round',sans-serif; font-size:14px; padding:11px 13px; border-radius:14px; cursor:pointer; white-space:nowrap;}
+  .doneBtn:active{transform:scale(.93);}
+  .stPend{display:block; font-size:12.5px; color:#b26b00; background:#fff3e0; border-radius:12px; padding:8px 11px; white-space:nowrap; text-align:center;}
+  .stDone{display:block; font-size:13px; color:var(--short); text-align:center; white-space:nowrap; line-height:1.35;}
+  .stDone small{color:var(--ink-soft); font-size:11px;}
+  .choreEdit{border:none; background:#f4f2fa; color:var(--ink-soft); width:36px; height:36px; border-radius:12px; font-size:15px; cursor:pointer; flex:none;}
+  .choreEdit:active{transform:scale(.9);}
+  .addChore{display:block; width:100%; border:2px dashed #d8d4e6; background:#fff; color:var(--long); font-family:'Varela Round',sans-serif; font-size:16px; padding:15px; border-radius:20px; cursor:pointer; margin-bottom:8px;}
+  .addChore:active{transform:scale(.98);}
+  .choreEmpty{color:var(--ink-soft); font-size:14px; text-align:center; padding:26px 14px; background:#fff; border-radius:var(--radius); box-shadow:var(--shadow); line-height:1.6;}
+  .emojiPick{display:flex; gap:7px; flex-wrap:wrap;}
+  .emojiPick button{border:2px solid var(--line); background:#fff; border-radius:14px; width:44px; height:44px; font-size:22px; cursor:pointer;}
+  .emojiPick button.on{border-color:var(--long); background:var(--long-l);}
+  .emojiPick button:active{transform:scale(.9);}
+  .cadPick{display:flex; gap:8px;}
+  .cadPick button{flex:1; border:2px solid var(--line); background:#fff; border-radius:14px; padding:12px; font-family:'Varela Round',sans-serif; font-size:15px; cursor:pointer; color:var(--ink);}
+  .cadPick button.on{border-color:var(--long); background:var(--long-l); color:var(--long);}
+  .cadPick button:active{transform:scale(.96);}
+
   .toast{position:fixed; left:50%; bottom:26px; transform:translateX(-50%) translateY(20px); background:#2b2b3c; color:#fff; padding:15px 22px; border-radius:18px; font-weight:600; font-size:15px; box-shadow:var(--shadow); opacity:0; pointer-events:none; transition:.35s; z-index:80; max-width:90vw; text-align:center;}
   .toast.on{opacity:1; transform:translateX(-50%) translateY(0);}
   .burst{position:fixed; inset:0; pointer-events:none; z-index:70; overflow:hidden;}
@@ -192,6 +247,7 @@
   <!-- ===== HOME ===== -->
   <div id="home">
     <div class="top">
+      <button class="gear" id="menuBtn" title="תפריט">☰</button>
       <div class="brand"><span class="logo">🫙</span><h1>הקופות של <span class="nm" id="titleName">שלי</span></h1></div>
       <button class="gear" id="gear" title="הגדרות">⚙️</button>
     </div>
@@ -256,6 +312,19 @@
     </div>
   </div>
 
+  <!-- ===== CHORES ===== -->
+  <div id="chores" class="chores">
+    <div class="top">
+      <button class="gear" id="menuBtn2" title="תפריט">☰</button>
+      <div class="brand"><span class="logo">🧺</span><h1>מטלות בית</h1></div>
+      <button class="gear" id="choreAddTop" title="מטלה חדשה">➕</button>
+    </div>
+    <div id="pendingBox"></div>
+    <div class="choreList" id="choreList"></div>
+    <button class="addChore" id="addChoreBtn">➕ מטלה חדשה</button>
+    <div class="foot">🧺 הילד/ה מסמן/ת שביצע/ה מטלה, וההורה מאשר/ת — ואז הכסף נכנס לארנק לחלוקה לצנצנות.</div>
+  </div>
+
 </div>
 
 <!-- modal (income / withdraw) -->
@@ -274,6 +343,44 @@
     <div class="taxNote" id="taxNote" style="display:none;"></div>
     <div class="err" id="err"></div>
     <div class="mactions"><button class="cancel" id="cancelBtn">ביטול</button><button class="ok" id="okBtn">אישור</button></div>
+  </div>
+</div>
+
+<!-- chore add/edit sheet -->
+<div class="scrim" id="choreScrim">
+  <div class="sheet">
+    <div class="mhead"><span class="em" id="choreEmojiPreview">✅</span><span class="mt" id="choreSheetTitle">מטלה חדשה</span></div>
+    <div class="field">
+      <label>שם המטלה</label>
+      <div class="reason" style="margin-top:0"><input id="choreNameInput" maxlength="30" placeholder="לדוגמה: להוציא את הזבל" /></div>
+    </div>
+    <div class="field" style="margin-top:16px;">
+      <label>איזה איקון?</label>
+      <div class="emojiPick" id="emojiPick"></div>
+    </div>
+    <div class="field" style="margin-top:16px;">
+      <label>כמה מקבלים על המטלה?</label>
+      <div class="amtInput"><input id="choreAmt" type="number" inputmode="numeric" min="0" step="1" placeholder="0" /><span class="cur">₪</span></div>
+    </div>
+    <div class="field" style="margin-top:16px;">
+      <label>כל כמה זמן אפשר לעשות שוב?</label>
+      <div class="cadPick" id="cadPick">
+        <button data-cad="daily" class="on">כל יום</button>
+        <button data-cad="weekly">כל שבוע</button>
+      </div>
+    </div>
+    <div class="err" id="choreErr"></div>
+    <div class="mactions"><button class="cancel" id="choreCancel">ביטול</button><button class="ok" id="choreSave" style="background:var(--long)">שמירה</button></div>
+    <button class="setBtn danger" id="choreDelete" style="margin-top:12px; display:none; justify-content:center;"><span>🗑️</span><div><b>למחוק את המטלה</b></div></button>
+  </div>
+</div>
+
+<!-- side nav drawer -->
+<div class="scrim navScrim" id="navScrim">
+  <div class="drawer">
+    <div class="drawerHead"><span class="logo">🫙</span><span>התפריט</span></div>
+    <button class="navItem" data-nav="home"><span>🫙</span><b>הקופות</b></button>
+    <button class="navItem" data-nav="chores"><span>🧺</span><b>מטלות בית</b></button>
   </div>
 </div>
 
@@ -322,8 +429,17 @@ function monthLabel(d){ return HMONTHS[d.getMonth()]+' '+d.getFullYear(); }
 
 /* -------- state -------- */
 let state=null, view='home', current=null, logLimit=8, alloc={};
-function fresh(){ return {name:'',wallet:0,jars:{treats:0,short:0,long:0,give:0},principal:{short:0,long:0},longStart:null,received:0,lastInterest:null,log:[]}; }
+let choreDraft={id:null,emoji:'✅',cadence:'daily'};
+const CHORE_EMOJIS=['✅','🛏️','🍽️','📚','🧹','🧺','🗑️','🚿','🪥','🐕','🌱','🧸'];
+let cid=0; function newChoreId(){ return 'c'+Date.now().toString(36)+(cid++).toString(36); }
+function seedChores(){ return [
+  {id:newChoreId(),name:'לסדר את המיטה',   emoji:'🛏️',amount:2,cadence:'daily', pendingAt:null,lastApproved:null},
+  {id:newChoreId(),name:'לפנות את השולחן', emoji:'🍽️',amount:3,cadence:'daily', pendingAt:null,lastApproved:null},
+  {id:newChoreId(),name:'שיעורי בית',      emoji:'📚',amount:5,cadence:'daily', pendingAt:null,lastApproved:null},
+]; }
+function fresh(){ return {name:'',wallet:0,jars:{treats:0,short:0,long:0,give:0},principal:{short:0,long:0},longStart:null,received:0,lastInterest:null,log:[],chores:seedChores()}; }
 function r2(n){ return Math.round(n*100)/100; }
+function esc(s){ return String(s).replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch])); }
 function fmt(n){ const v=r2(n); const o=Number.isInteger(v)?{maximumFractionDigits:0}:{minimumFractionDigits:0,maximumFractionDigits:2}; return new Intl.NumberFormat('he-IL',o).format(v)+' ₪'; }
 function addLog(jar,label,amount,note){ state.log.unshift({t:Date.now(),jar,label,amount,note:note||''}); if(state.log.length>400) state.log.length=400; }
 function earnedInterest(jar){ return r2(state.log.filter(e=>e.jar===jar && e.label.indexOf('ריבית')===0).reduce((s,e)=>s+e.amount,0)); }
@@ -334,6 +450,18 @@ function taxCalc(jar,W){ const bal=state.jars[jar]; if(bal<=0) return {interestP
 function maxReceivable(jar){ const bal=state.jars[jar]; const f=bal>0?jarGains(jar)/bal:0; return r2(bal/(1+0.25*f)); }
 function earnedMatch(jar){ return r2(state.log.filter(e=>e.jar===jar && e.note==='התאמה').reduce((s,e)=>s+e.amount,0)); }
 function incomeTotal(){ return r2(state.log.filter(e=>e.jar==='wallet' && e.amount>0).reduce((s,e)=>s+e.amount,0)); }
+
+/* -------- chores -------- */
+function dayKey(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function weekKey(d){ const t=new Date(d.getFullYear(),d.getMonth(),d.getDate()); const day=(t.getDay()+6)%7; t.setDate(t.getDate()-day+3); const first=new Date(t.getFullYear(),0,4); const week=1+Math.round(((t-first)/86400000-3+((first.getDay()+6)%7))/7); return t.getFullYear()+'-W'+String(week).padStart(2,'0'); }
+function periodKey(cadence,d){ return cadence==='weekly'?weekKey(d):dayKey(d); }
+function choreStatus(c){
+  if(c.pendingAt) return 'pending';
+  if(c.lastApproved){ const now=new Date(); return periodKey(c.cadence,new Date(c.lastApproved))===periodKey(c.cadence,now) ? 'done' : 'available'; }
+  return 'available';
+}
+function choreResetLabel(c){ return c.cadence==='weekly' ? 'מתחדש בשבוע הבא' : 'מתחדש מחר'; }
+function pendingChores(){ return state.chores.filter(c=>c.pendingAt); }
 
 /* -------- backup reminder -------- */
 const BACKUP_REMIND_MS=7*24*60*60*1000;
@@ -458,10 +586,87 @@ function confirmDivide(){
   goHome();
 }
 
+/* -------- CHORES -------- */
+function openChores(){ view='chores'; current=null; show('chores'); renderChores(); }
+function renderChores(){
+  const pendBox=document.getElementById('pendingBox');
+  const pend=pendingChores();
+  if(pend.length){
+    pendBox.innerHTML=`<div class="pendCard"><div class="pendTitle">✋ מחכה לאישור הורה</div>`+
+      pend.map(c=>`<div class="pendRow"><div class="pn">${c.emoji||'✅'} ${esc(c.name)}</div><div class="pa">+${fmt(c.amount)}</div><div class="pb"><button class="ok" data-approve="${c.id}">✓ אישור</button><button class="no" data-reject="${c.id}">✗ עוד לא</button></div></div>`).join('')+
+      `</div>`;
+  } else pendBox.innerHTML='';
+
+  const list=document.getElementById('choreList');
+  if(!state.chores.length){ list.innerHTML=`<div class="choreEmpty">עדיין אין מטלות 🧺<br>הוסיפו מטלה כדי להתחיל להרוויח כסף לצנצנות.</div>`; return; }
+  list.innerHTML=state.chores.map(c=>{
+    const st=choreStatus(c), cad=c.cadence==='weekly'?'כל שבוע':'כל יום';
+    let ctl;
+    if(st==='pending') ctl=`<span class="stPend">⏳ מחכה לאישור</span>`;
+    else if(st==='done') ctl=`<span class="stDone">✓ כל הכבוד<br><small>${choreResetLabel(c)}</small></span>`;
+    else ctl=`<button class="doneBtn" data-done="${c.id}">עשיתי! 🙌</button>`;
+    return `<div class="choreRow">
+      <div class="choreEm">${c.emoji||'✅'}</div>
+      <div class="choreInfo"><div class="choreName">${esc(c.name)}</div><div class="choreMeta"><span class="rw">+${fmt(c.amount)}</span><span class="badge">${cad}</span></div></div>
+      <div class="choreCtl">${ctl}</div>
+      <button class="choreEdit" data-edit="${c.id}">✏️</button>
+    </div>`;
+  }).join('');
+}
+function markChoreDone(id){ const c=state.chores.find(x=>x.id===id); if(!c||choreStatus(c)!=='available') return; c.pendingAt=Date.now(); Store.save(state); renderChores(); toast('נשלח לאישור הורה ✋'); }
+function approveChore(id){ const c=state.chores.find(x=>x.id===id); if(!c||!c.pendingAt) return;
+  state.wallet=r2(state.wallet+c.amount); addLog('wallet','מטלה: '+c.name,c.amount,'');
+  c.lastApproved=Date.now(); c.pendingAt=null; Store.save(state); celebrate();
+  toast(`אושר! +${fmt(c.amount)} נכנסו לארנק 💰`); renderChores();
+}
+function rejectChore(id){ const c=state.chores.find(x=>x.id===id); if(!c||!c.pendingAt) return; c.pendingAt=null; Store.save(state); renderChores(); toast('לא אושר — אפשר לנסות שוב 🙂'); }
+function buildEmojiPick(){ const box=document.getElementById('emojiPick'); box.innerHTML='';
+  CHORE_EMOJIS.forEach(em=>{ const b=document.createElement('button'); b.textContent=em; if(em===choreDraft.emoji) b.className='on';
+    b.onclick=()=>{ choreDraft.emoji=em; buildEmojiPick(); document.getElementById('choreEmojiPreview').textContent=em; }; box.appendChild(b); });
+  document.getElementById('choreEmojiPreview').textContent=choreDraft.emoji;
+}
+function buildCadPick(){ document.querySelectorAll('#cadPick button').forEach(b=>b.classList.toggle('on', b.dataset.cad===choreDraft.cadence)); }
+function openChoreEdit(id){
+  const c=id?state.chores.find(x=>x.id===id):null;
+  choreDraft={id:id||null, emoji:c?(c.emoji||'✅'):'✅', cadence:c?c.cadence:'daily'};
+  document.getElementById('choreSheetTitle').textContent=c?'עריכת מטלה':'מטלה חדשה';
+  document.getElementById('choreNameInput').value=c?c.name:'';
+  document.getElementById('choreAmt').value=c?c.amount:'';
+  document.getElementById('choreErr').textContent='';
+  document.getElementById('choreDelete').style.display=c?'flex':'none';
+  buildEmojiPick(); buildCadPick();
+  document.getElementById('choreScrim').classList.add('on');
+  setTimeout(()=>document.getElementById('choreNameInput').focus(),120);
+}
+function saveChore(){
+  const name=document.getElementById('choreNameInput').value.trim();
+  const amt=r2(parseFloat(document.getElementById('choreAmt').value));
+  const err=document.getElementById('choreErr');
+  if(!name){ err.textContent='כתבו שם למטלה'; return; }
+  if(!(amt>0)){ err.textContent='כתבו סכום גדול מ‑0'; return; }
+  if(choreDraft.id){ const c=state.chores.find(x=>x.id===choreDraft.id); if(c){ c.name=name; c.amount=amt; c.emoji=choreDraft.emoji; c.cadence=choreDraft.cadence; } }
+  else state.chores.push({id:newChoreId(),name,emoji:choreDraft.emoji,amount:amt,cadence:choreDraft.cadence,pendingAt:null,lastApproved:null});
+  Store.save(state); document.getElementById('choreScrim').classList.remove('on'); renderChores();
+  toast(choreDraft.id?'המטלה עודכנה ✅':'מטלה חדשה נוספה ✅');
+}
+function deleteChore(){ if(!choreDraft.id) return; if(!confirm('למחוק את המטלה? אי אפשר לבטל.')) return;
+  state.chores=state.chores.filter(x=>x.id!==choreDraft.id); Store.save(state);
+  document.getElementById('choreScrim').classList.remove('on'); renderChores(); toast('המטלה נמחקה 🗑️');
+}
+
 /* -------- view switch -------- */
-function show(v){ ['home','detail','divide'].forEach(id=>document.getElementById(id).style.display = id===v?'block':'none'); const el=document.getElementById(v); el.classList.remove('view-enter'); void el.offsetWidth; el.classList.add('view-enter'); window.scrollTo(0,0); }
+function show(v){ ['home','detail','divide','chores'].forEach(id=>document.getElementById(id).style.display = id===v?'block':'none'); const el=document.getElementById(v); el.classList.remove('view-enter'); void el.offsetWidth; el.classList.add('view-enter'); window.scrollTo(0,0); }
 function goHome(){ view='home'; current=null; logLimit=8; show('home'); renderHome(); }
-function refresh(){ if(view==='home') renderHome(); else if(view==='detail') renderDetail(); }
+function refresh(){ if(view==='home') renderHome(); else if(view==='detail') renderDetail(); else if(view==='chores') renderChores(); }
+
+/* -------- side nav drawer -------- */
+function openNav(){
+  const cur = view==='chores' ? 'chores' : 'home';
+  document.querySelectorAll('#navScrim .navItem').forEach(b=>b.classList.toggle('active', b.dataset.nav===cur));
+  document.getElementById('navScrim').classList.add('on');
+}
+function closeNav(){ document.getElementById('navScrim').classList.remove('on'); }
+function navTo(dest){ closeNav(); if(dest==='chores') openChores(); else goHome(); }
 
 /* -------- modal (income / withdraw) -------- */
 let modal={mode:null,jar:null};
@@ -573,6 +778,21 @@ document.getElementById('reasonInput').addEventListener('keydown',e=>{ if(e.key=
 document.getElementById('interestBtn').onclick=giveInterest;
 document.getElementById('nameInput').addEventListener('input',e=>{ state.name=e.target.value.trim(); document.getElementById('titleName').textContent=state.name||'שלי'; Store.save(state); });
 document.getElementById('gear').onclick=()=>{ document.getElementById('setScrim').classList.add('on'); };
+document.getElementById('menuBtn').onclick=openNav;
+document.getElementById('menuBtn2').onclick=openNav;
+document.getElementById('navScrim').addEventListener('click',e=>{ const it=e.target.closest('[data-nav]'); if(it){ navTo(it.dataset.nav); return; } if(e.target.id==='navScrim') closeNav(); });
+
+/* chores events */
+document.getElementById('addChoreBtn').onclick=()=>openChoreEdit(null);
+document.getElementById('choreAddTop').onclick=()=>openChoreEdit(null);
+document.getElementById('choreList').addEventListener('click',e=>{ const d=e.target.closest('[data-done]'), ed=e.target.closest('[data-edit]'); if(d) markChoreDone(d.dataset.done); else if(ed) openChoreEdit(ed.dataset.edit); });
+document.getElementById('pendingBox').addEventListener('click',e=>{ const ap=e.target.closest('[data-approve]'), rj=e.target.closest('[data-reject]'); if(ap) approveChore(ap.dataset.approve); else if(rj) rejectChore(rj.dataset.reject); });
+document.getElementById('choreCancel').onclick=()=>document.getElementById('choreScrim').classList.remove('on');
+document.getElementById('choreSave').onclick=saveChore;
+document.getElementById('choreDelete').onclick=deleteChore;
+document.getElementById('choreScrim').addEventListener('click',e=>{ if(e.target.id==='choreScrim') e.currentTarget.classList.remove('on'); });
+document.getElementById('cadPick').addEventListener('click',e=>{ const b=e.target.closest('[data-cad]'); if(b){ choreDraft.cadence=b.dataset.cad; buildCadPick(); } });
+document.getElementById('choreNameInput').addEventListener('keydown',e=>{ if(e.key==='Enter') saveChore(); });
 document.getElementById('setClose').onclick=()=>document.getElementById('setScrim').classList.remove('on');
 document.getElementById('setScrim').addEventListener('click',e=>{ if(e.target.id==='setScrim') e.currentTarget.classList.remove('on'); });
 function doBackup(){
@@ -600,6 +820,7 @@ document.getElementById('importFile').onchange=e=>{
     state.jars=Object.assign({treats:0,short:0,long:0,give:0},state.jars||{});
     state.log=state.log||[]; if(typeof state.wallet!=='number') state.wallet=0;
     if(!state.principal) state.principal={short:0,long:0};
+    if(!Array.isArray(state.chores)) state.chores=[];
     Store.save(state); document.getElementById('setScrim').classList.remove('on'); goHome(); toast('הנתונים שוחזרו 📥');
   }catch(err){ toast('הקובץ לא תקין'); } e.target.value=''; };
   rdr.readAsText(f);
@@ -616,6 +837,7 @@ if('serviceWorker' in navigator && (location.protocol==='https:'||location.proto
 (async()=>{
   const saved=await Store.load(); state=saved||fresh();
   state.jars=Object.assign({treats:0,short:0,long:0,give:0},state.jars||{}); state.log=state.log||[];
+  if(!Array.isArray(state.chores)) state.chores=[];
   if(typeof state.wallet!=='number') state.wallet=0;
   if(typeof state.received!=='number'){ state.received = (typeof state.totalIn==='number')?state.totalIn : state.log.reduce((s,e)=>s+(e.amount>0?e.amount:0),0); }
   if(!state.principal){ state.principal={short:0,long:0}; ['short','long'].forEach(k=>{ const g=earnedInterest(k); state.principal[k]=r2(Math.max(0, state.jars[k]-g)); }); }
